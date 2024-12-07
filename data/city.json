@@ -1,0 +1,42 @@
+{
+    "mumbai": [
+        {
+            "name": "Jagannath Kitchen",
+            "contact": "022 2202 0007",
+            "address": "Shop No. 1, Ground Floor, Shreeji Sadan, Opposite Jain Mandir, 90 Feet Road, Ghatkopar East, Mumbai",
+            "menu": [
+                {
+                    "name": "Thali",
+                    "price": 100
+                },
+                {
+                    "name": "Puri Bhaji",
+                    "price": 50
+                },
+                {
+                    "name": "Pav Bhaji",
+                    "price": 60
+                }
+            ]
+        },
+        {
+            "name": "Soulful Meals",
+            "contact": "022 2202 0007",
+            "address": "Shop No. 1, Ground Floor, Shreeji Sadan, Opposite Jain Mandir, 90 Feet Road, Ghatkopar East, Mumbai",
+            "menu": [
+                {
+                    "name": "Thali",
+                    "price": 100
+                },
+                {
+                    "name": "Puri Bhaji",
+                    "price": 50
+                },
+                {
+                    "name": "Pav Bhaji",
+                    "price": 60
+                }
+            ]
+        }
+    ]
+}
