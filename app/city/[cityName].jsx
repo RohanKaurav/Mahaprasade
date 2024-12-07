@@ -6,19 +6,31 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
+import cityData from "../../data/city.json";
 
 export default function HomeScreen() {
   const { cityName } = useLocalSearchParams();
-  let validCities = ["mumbai", "kharagpur", "delhi", "bangalore"];
-  const [isCurrentCityValid, setCurrentCityValid] = useState(validCities.includes(cityName));
+  const [prasadamProviders, setPrasadamProviders] = useState(getPrasadamProviders(cityName));
+
+  function getPrasadamProviders(cityName) {
+    if (!cityData[cityName]) {
+      return [];
+    }
+    return cityData[cityName];
+  }
+  
   return (
     <View>
       <View className='h-screen bg-blue-500 justify-center items-center'>
-        {isCurrentCityValid ? <Text>
-            Welcome to the {cityName}
-        </Text> : <Text>
-            Invalid city name
-        </Text>}
+        {prasadamProviders.length > 0 ? prasadamProviders.map((prasadamProvider) =>{
+          return (
+            <View className="m-5">
+              <Text>{prasadamProvider.name}</Text>
+              <Text>{prasadamProvider.address}</Text>
+              <Text>{prasadamProvider.phone}</Text>
+            </View>
+          )
+        }) : <Text>Hare Krishna! Sorry Currently we don't have this city's data</Text>}
       </View>
     </View>
   );
