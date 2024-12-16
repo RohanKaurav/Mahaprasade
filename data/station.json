@@ -1,37 +1,37 @@
 [
     {
       "id": 1,
-      "station": "Mumbai",
+      "name": "Mumbai",
       "Vendors_list": [1, 2, 3, 4]
     },
     {
       "id": 2,
-      "station": "Mumbra",
+      "name": "Mumbra",
       "Vendors_list": [5, 6, 7]
     },
     {
       "id": 3,
-      "station": "Kharagpur",
+      "name": "Kharagpur",
       "Vendors_list": [8, 9]
     },
     {
       "id": 4,
-      "station": "kharghar",
+      "name": "kharghar",
       "Vendors_list": [10, 11, 12]
     },
     {
       "id": 5,
-      "station": "Satara",
+      "name": "Satara",
       "Vendors_list": [13, 14]
     },
     {
       "id": 6,
-      "station": "Sangli",
+      "name": "Sangli",
       "Vendors_list": [14, 15, 16]
     },
     {
         "id": 7,
-        "station": "kharadi",
+        "name": "kharadi",
         "Vendors_list": [17]
       }
   ]

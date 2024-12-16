@@ -1,17 +1,30 @@
-import { Image, StyleSheet, Platform, View, Text, Keyboard } from 'react-native';
-import { useState } from 'react';
+import { Platform, View, Text, Keyboard, FlatList, Pressable } from 'react-native';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
-import totalData from '../data/station.json';
-import { FlatList, Pressable } from 'react-native';
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import { SearchIcon, CloseIcon } from '@/components/ui/icon';
-
-
+import { db } from "../app/firebase_config";
+import { getDocs, collection } from "firebase/firestore";
 
 function HomeSearch() {
   const [query, setQuery] = useState(''); // Keeps track of user input
   const [filterData, setFilterData] = useState([]); // The filtered data array
+  const [totalData, setTotalData] = useState([]); // Holds all station data
   const router = useRouter(); // For navigation
+
+  // Fetch data from Firestore on component mount
+  useEffect(() => {
+    const fetchStations = async () => {
+      const snapshot = await getDocs(collection(db, 'stations'));
+      const data = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setTotalData(data);
+    };
+
+    fetchStations();
+  }, []);
 
   // Handle input change in the search bar
   const handleInputChange = (text) => {
@@ -23,7 +36,7 @@ function HomeSearch() {
   function handleSearchQuery(text) {
     text = text.toLowerCase(); // Convert text to lowercase for case-insensitive comparison
     const filteredArray = totalData.filter((item) =>
-      item.station.toLowerCase().includes(text)
+      item.name.toLowerCase().includes(text)
     );
     setFilterData(filteredArray); // Update the filtered data
   }
@@ -36,9 +49,9 @@ function HomeSearch() {
 
   return (
     <View className="h-full">
-      <View className={"flex flex-col items-center justify-end h-1/2 relative w-full" }>
+      <View className={"flex flex-col items-center justify-end h-1/2 relative w-full"}>
         {/* Search Bar */}
-        <Input className= {`${Platform.OS==='web' ? 'w-[50%]' : 'w-[80%]'} relative z-10 `}>
+        <Input className={`${Platform.OS === 'web' ? 'w-[50%]' : 'w-[80%]'} relative z-10`}>
           <InputField
             onChangeText={handleInputChange}
             value={query}
@@ -63,7 +76,7 @@ function HomeSearch() {
         {/* Dropdown Results */}
         {query.trim().length > 0 && (
           <View
-            className={`${Platform.OS==='web' ? 'w-[50%]' : 'w-[80%]'} bg-white rounded-lg border border-gray-300 shadow-md absolute top-full mt-2 z-20`}
+            className={`${Platform.OS === 'web' ? 'w-[50%]' : 'w-[80%]'} bg-white rounded-lg border border-gray-300 shadow-md absolute top-full mt-2 z-20`}
           >
             {filterData.length > 0 ? (
               <FlatList
@@ -72,9 +85,9 @@ function HomeSearch() {
                 renderItem={({ item }) => (
                   <Pressable
                     className="p-3 border-b border-gray-200"
-                    onPress={() => router.push(`/Station/${item.id}`)}
+                    onPress={() => router.push(`/station/${item.id}`)}
                   >
-                    <Text className="text-gray-800">{item.station}</Text>
+                    <Text className="text-gray-800">{item.name}</Text>
                   </Pressable>
                 )}
               />

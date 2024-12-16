@@ -1,7 +1,7 @@
-/*import { initializeApp } from "firebase/app";   
-import {getFireStore} from "@firebase/firestore";
-/* npm install firebase*/
-/*
+import { initializeApp } from "firebase/app";   
+import {getFirestore} from "@firebase/firestore";
+
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyDXQe4PER8E9V8LW41-T1p3cvreN3-0TR4",
@@ -15,4 +15,4 @@ const firebaseConfig = {
 
   const app= initializeApp(firebaseConfig)
   
-  export const db= getFireStore(app)*/
+  export const db= getFirestore(app)

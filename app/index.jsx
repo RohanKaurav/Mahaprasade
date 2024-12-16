@@ -10,6 +10,7 @@ import { Button, ButtonText } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 
+
 import HomeSearch from "../components/HomeSearch"
 
 

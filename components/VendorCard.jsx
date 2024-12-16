@@ -1,21 +1,16 @@
-import { View, Text, Image, Pressable } from 'react-native';
+import {View, Text, Image, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 
 function VendorCard({ vendor }) {
-    return (
-        <Pressable className="p-4 bg-white rounded-lg shadow-md "  style={{
-            marginHorizontal: 10, // mx-1
-            marginTop: 4,        // mt-1
-            marginBottom: 10,     // mb-2
-        }}>
-            {/* <View>
-                <Image
-                    source={{ uri: vendor.img }}
-                    className="w-24 h-24 rounded-lg mb-4"
-                />
+    const router = useRouter(); 
 
-                <Text className="text-lg font-bold text-gray-800">{vendor.name}</Text>
-                <Text className="text-sm text-gray-600 my-2">{vendor.description}</Text>
-            </View> */}
+    
+    return (
+        <Pressable onPress={() => router.push(`/vendor/${vendor.id}`)} className="p-4 bg-white rounded-lg shadow-md "  style={{
+            marginHorizontal: 10, 
+            marginTop: 4,        
+            marginBottom: 10,     
+        }}>
             <View className="flex-row items-center">
                 <Image
                     source={{ uri: vendor.img }}
