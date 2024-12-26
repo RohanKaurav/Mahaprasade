@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Image, Pressable } from 'react-native';
+import { View, Text, FlatList, Image, Pressable ,TextInput,Input} from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import VendorCard from '../../components/VendorCard';
 import { Icon } from '@/components/ui/icon';
@@ -96,6 +96,7 @@ function StationDetails() {
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => <VendorCard vendor={item} />}
                 />
+                
         </>
         
     );

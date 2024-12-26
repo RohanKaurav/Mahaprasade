@@ -30,10 +30,11 @@ export default function RootLayout() {
   }
 
   return (
-    <GluestackUIProvider mode="light"><ThemeProvider value={colorScheme == 'dark' ? DarkTheme : DefaultTheme}>
+    <GluestackUIProvider mode="light"><ThemeProvider value={colorScheme != 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
         <Stack.Screen name="index" options={{ headerShown:false }} />
         {/* <Stack.Screen name="station/[id]" options={{ headerTitle: "station"}} /> */}
+        <Stack.Screen name="vendor/[vendor_id]" options={{ headerShown:false}} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider></GluestackUIProvider>

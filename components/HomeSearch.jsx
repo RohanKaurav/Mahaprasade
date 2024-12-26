@@ -85,7 +85,9 @@ function HomeSearch() {
                 renderItem={({ item }) => (
                   <Pressable
                     className="p-3 border-b border-gray-200"
-                    onPress={() => router.push(`/station/${item.id}`)}
+                    onPress={() => 
+                         router.push(`/station/${item.id}`)
+                      }
                   >
                     <Text className="text-gray-800">{item.name}</Text>
                   </Pressable>
