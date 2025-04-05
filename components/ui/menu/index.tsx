@@ -8,7 +8,7 @@ import { Motion, AnimatePresence } from '@legendapp/motion';
 import type { VariantProps } from '@gluestack-ui/nativewind-utils';
 
 const menuStyle = tva({
-  base: 'rounded-md bg-background-0 border border-outline-100 p-1 shadow-hard-5',
+  base: 'rounded-md bg-transparent border border-transparent p-1 shadow-none',
 });
 
 const menuItemStyle = tva({

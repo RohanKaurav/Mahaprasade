@@ -43,7 +43,7 @@ function StationDetails() {
             ...doc.data(),
             id: doc.id,
             
-          } ));
+          } )).filter((vendor) => vendor.isApproved);
           setVendorData(data);
         };
     

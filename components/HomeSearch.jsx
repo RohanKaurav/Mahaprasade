@@ -2,9 +2,18 @@ import { Platform, View, Text, Keyboard, FlatList, Pressable } from 'react-nativ
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
-import { SearchIcon, CloseIcon } from '@/components/ui/icon';
+import { SearchIcon, CloseIcon, MenuIcon } from '@/components/ui/icon';
 import { db } from "../app/firebase_config";
 import { getDocs, collection } from "firebase/firestore";
+import { Button, ButtonText, ButtonIcon } from './ui/button';
+import { Icon } from '@/components/ui/icon';
+import { Badge, BadgeText } from "@/components/ui/badge";
+import {
+  Menu,
+  MenuItem,
+  MenuItemLabel,
+  MenuSeparator
+} from '@/components/ui/menu';
 
 function HomeSearch() {
   const [query, setQuery] = useState(''); // Keeps track of user input
@@ -49,6 +58,57 @@ function HomeSearch() {
 
   return (
     <View className="h-full">
+      <View className="absolute top-0 left-0 z-10 bg-transparent border-0">
+        <Menu
+          offset={0}
+          trigger={({ ...triggerProps }) => {
+            return (
+              <Pressable {...triggerProps} className="bg-transparent border-0 p-0 active:bg-transparent focus:bg-transparent">
+                <MenuIcon className="text-typography-500 w-6 h-6" />
+              </Pressable>
+            );
+          }}
+        >
+          <MenuItem
+            key="Membership"
+            textValue="Membership"
+            className="p-2 justify-between"
+            onPress={() => {
+              try {
+                router.push(`/Login_page`);
+              } catch (error) {
+                console.error("Navigation Error:", error);
+              }
+            }}
+          >
+            <MenuItemLabel size="sm">Vendor</MenuItemLabel>
+          </MenuItem>
+          <MenuItem key="Orders" textValue="Orders" className="p-2">
+            <MenuItemLabel size="sm">Orders</MenuItemLabel>
+          </MenuItem>
+          <MenuItem
+              key="AdminPanel"
+              textValue="Admin Panel"
+              className="p-2"
+              onPress={() => router.push(`/Admin`)}
+            >
+              <MenuItemLabel size="sm">Login as Admin</MenuItemLabel>
+            </MenuItem>
+            <MenuSeparator />
+
+          <MenuItem key="Address Book" textValue="Address Book" className="p-2">
+            <MenuItemLabel size="sm">Address Book</MenuItemLabel>
+          </MenuItem>
+          <MenuSeparator />
+          <MenuItem key="Help Center" textValue="Help Center" className="p-2">
+            <MenuItemLabel size="sm">Help Center</MenuItemLabel>
+          </MenuItem>
+          <MenuSeparator />
+          <MenuItem key="Logout" textValue="Logout" className="p-2">
+            <MenuItemLabel size="sm">Logout</MenuItemLabel>
+          </MenuItem>
+        </Menu>
+      </View>
       <View className={"flex flex-col items-center justify-end h-1/2 relative w-full"}>
         {/* Search Bar */}
         <Input className={`${Platform.OS === 'web' ? 'w-[50%]' : 'w-[80%]'} relative z-10`}>
@@ -85,9 +145,7 @@ function HomeSearch() {
                 renderItem={({ item }) => (
                   <Pressable
                     className="p-3 border-b border-gray-200"
-                    onPress={() => 
-                         router.push(`/station/${item.id}`)
-                      }
+                    onPress={() => router.push(`/station/${item.id}`)}
                   >
                     <Text className="text-gray-800">{item.name}</Text>
                   </Pressable>
