@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import { Image, TouchableOpacity } from 'react-native';
+import { Image, TouchableOpacity, Pressable } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db } from "../firebase_config";
 import { getDoc, updateDoc, doc, getDocs, collection } from "firebase/firestore";
 import {
@@ -34,7 +36,8 @@ export default function Menu() {
           contact: vendor.contact,
           address: vendor.address,
           description: vendor.description,
-          image: vendor.image,
+          imageurl: vendor.imageurl,
+          imagePath: vendor.imagePath || null,
         });
         setMenu(vendor.menu || []);
       }
@@ -42,6 +45,50 @@ export default function Menu() {
 
     fetchVendorData();
   }, []);
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+  
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri;
+      const imageName = `${vendor_card_login}_${Date.now()}`;
+      const storage = getStorage();
+      const imageRef = ref(storage, `vendorImages/${imageName}`);
+  
+      try {
+        // Save previous path BEFORE overwriting vendorDetails
+        const prevPath = vendorDetails.imagePath;
+  
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+        await uploadBytes(imageRef, blob);
+  
+        const downloadURL = await getDownloadURL(imageRef);
+  
+        // Update state only after upload success
+        setVendorDetails(prev => ({
+          ...prev,
+          imageurl: downloadURL,
+          imagePath: `vendorImages/${imageName}`,
+        }));
+  
+        // Delete old image AFTER new one is uploaded
+        if (prevPath) {
+          const oldRef = ref(storage, prevPath);
+          await deleteObject(oldRef);
+          console.log("Old image deleted");
+        }
+  
+      } catch (err) {
+        console.error("Error during image upload:", err);
+        alert("Failed to upload or delete image");
+      }
+    }
+  };
+  
 
   const handleUpdateProfile  = async () => {
     if (!vendor_card_login || vendor_card_login === "-1") {
@@ -56,7 +103,10 @@ export default function Menu() {
         contact: vendorDetails.contact,
         address: vendorDetails.address,
         description: vendorDetails.description,
+        ...(vendorDetails.imageurl && { imageurl: vendorDetails.imageurl }),
+        ...(vendorDetails.imagePath && { imagePath: vendorDetails.imagePath })
       });
+      
 
       alert("Profile updated successfully!");
       setProfileModalVisible(false);
@@ -65,56 +115,49 @@ export default function Menu() {
       alert("Failed to update profile.");
     }
   };
+
   const handleSaveMenuItem = async () => {
     if (!currentItem.name || !currentItem.price) {
       alert("Please fill all fields");
       return;
     }
-  
+
     try {
       const vendorRef = doc(db, "vendors", vendor_card_login);
       const vendorSnap = await getDoc(vendorRef);
       const vendorData = vendorSnap.data();
       const existingMenu = vendorData.menu || [];
-  
+
       let updatedMenu;
-  
+
       if (currentItem.id) {
-        // Update existing item
         updatedMenu = existingMenu.map((item) =>
           item.id === currentItem.id ? { ...currentItem, price: parseFloat(currentItem.price) } : item
         );
       } else {
-        // **Forcing a properly structured ID**
         const uniqueID = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  
         const newItem = {
-          id: uniqueID, // 🔹 Ensuring ID is properly assigned
+          id: uniqueID,
           name: currentItem.name,
           price: parseFloat(currentItem.price),
           description: currentItem.description,
         };
-  
+
         updatedMenu = [...existingMenu, newItem];
-        // console.log("New item being added:", newItem); // Debugging log
       }
-  
-      // console.log("Updated menu before writing to Firestore:", updatedMenu);
-  
+
       await updateDoc(vendorRef, { menu: updatedMenu });
       setMenu(updatedMenu);
       setMenuModalVisible(false);
       setCurrentItem({ id: '', name: '', price: '', description: '' });
-  
+
       alert("Menu updated successfully!");
     } catch (error) {
       console.error("Error updating menu:", error);
       alert("Failed to update menu.");
     }
   };
-  
-  
-  
+
   const handleDeleteMenuItem = async (id) => {
     try {
       const updatedMenu = menu.filter((item) => item.id !== id);
@@ -125,7 +168,6 @@ export default function Menu() {
       alert("Failed to delete item.");
     }
   };
-  
 
   const handleEditMenuItem = (item) => {
     setCurrentItem(item);
@@ -135,13 +177,15 @@ export default function Menu() {
   return (
     <View style={styles.container}>
       <View style={[styles.vendorContainer, styles.shadow]}>
-        <Image source={{ uri: vendorDetails.image }} style={styles.vendorImage} />
+        <Image source={{ uri: vendorDetails.imageurl }} style={styles.vendorImage} />
         <View style={styles.vendorInfo}>
           <Text style={styles.vendorName}>{vendorDetails.name}</Text>
           <Text style={styles.vendorDescription}>{vendorDetails.description}</Text>
           <Text style={styles.vendorDetail}>📍 {vendorDetails.address}</Text>
-          <Text style={styles.vendorDetail}>📞 {vendorDetails.contact}</Text>
-          <Button title="Edit Profile" onPress={() => setProfileModalVisible(true)} />
+          <Text style={styles.vendorDetail}>📞 {vendorDetails.contact}</Text>  
+          <TouchableOpacity style={styles.addButton} onPress={() => setProfileModalVisible(true)}>
+            <Text style={styles.addButtonText}>Edit Profile</Text>
+          </TouchableOpacity>      
         </View>
       </View>
 
@@ -154,12 +198,16 @@ export default function Menu() {
             <TextInput style={styles.input} placeholder="Address" value={vendorDetails.address} onChangeText={text => setVendorDetails({ ...vendorDetails, address: text })} />
             <TextInput style={styles.input} placeholder="Description" value={vendorDetails.description} onChangeText={text => setVendorDetails({ ...vendorDetails, description: text })} />
 
+            <TouchableOpacity style={[styles.addButton]} onPress={pickImage}>
+              <Text style={styles.addButtonText}>Change Image</Text>
+            </TouchableOpacity>
+            <br></br>
             <View style={styles.buttonContainer}>
-          <Button title="Save" onPress={handleUpdateProfile} />
-          <TouchableOpacity style={[styles.addButton, { backgroundColor: 'grey' }]} onPress={() => setProfileModalVisible(false)}>
-            <Text style={styles.cancelButtonText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
+              <Button title="Save" onPress={handleUpdateProfile} />
+              <TouchableOpacity style={[styles.addButton, { backgroundColor: 'grey' }]} onPress={() => setProfileModalVisible(false)}>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
 
           </View>
         </View>
@@ -174,13 +222,10 @@ export default function Menu() {
             <TextInput style={styles.input} placeholder="Description" value={currentItem.description} onChangeText={text => setCurrentItem({ ...currentItem, description: text })} />
             <TouchableOpacity style={styles.addButton} onPress= {handleSaveMenuItem}>
               <Text style={styles.addButtonText}>Save</Text>
-              </TouchableOpacity>  
-              <br>
-              </br>
-              <TouchableOpacity style={[styles.addButton, { backgroundColor: 'grey' }]} onPress={() => setMenuModalVisible(false)}>
+            </TouchableOpacity>  <br></br>
+            <TouchableOpacity style={[styles.addButton, { backgroundColor: 'grey' }]} onPress={() => setMenuModalVisible(false)}>
               <Text style={styles.addButtonText}>Cancel</Text>
-              </TouchableOpacity>
-
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -190,7 +235,7 @@ export default function Menu() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
-            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.itemName}>{item.name.toUpperCase()}</Text>
             <Text>Price: ₹{item.price}</Text>
             <Text>{item.description}</Text>
 
@@ -205,6 +250,7 @@ export default function Menu() {
           </View>
         )}
       />
+
       <TouchableOpacity style={styles.addButton} onPress={() => setMenuModalVisible(true)}>
         <Text style={styles.addButtonText}>+ Add Item</Text>
       </TouchableOpacity>

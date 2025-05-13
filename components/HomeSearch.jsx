@@ -58,12 +58,13 @@ function HomeSearch() {
 
   return (
     <View className="h-full">
-      <View className="absolute top-0 left-0 z-10 bg-transparent border-0">
+      <View className="absolute top-0 left-0 z-10 bg-transparent ">
         <Menu
           offset={0}
+          className="bg-white border border-blue-600 rounded-md shadow-lg"
           trigger={({ ...triggerProps }) => {
             return (
-              <Pressable {...triggerProps} className="bg-transparent border-0 p-0 active:bg-transparent focus:bg-transparent">
+              <Pressable {...triggerProps} className="bg-transparent border-0 p-0 active:bg-transparent focus:bg-transparent border-gray-300">
                 <MenuIcon className="text-typography-500 w-6 h-6" />
               </Pressable>
             );
@@ -82,10 +83,11 @@ function HomeSearch() {
             }}
           >
             <MenuItemLabel size="sm">Vendor</MenuItemLabel>
+            <MenuSeparator />
           </MenuItem>
-          <MenuItem key="Orders" textValue="Orders" className="p-2">
-            <MenuItemLabel size="sm">Orders</MenuItemLabel>
-          </MenuItem>
+          <MenuSeparator />
+          
+          <MenuSeparator />
           <MenuItem
               key="AdminPanel"
               textValue="Admin Panel"
@@ -96,26 +98,20 @@ function HomeSearch() {
             </MenuItem>
             <MenuSeparator />
 
-          <MenuItem key="Address Book" textValue="Address Book" className="p-2">
-            <MenuItemLabel size="sm">Address Book</MenuItemLabel>
-          </MenuItem>
-          <MenuSeparator />
-          <MenuItem key="Help Center" textValue="Help Center" className="p-2">
-            <MenuItemLabel size="sm">Help Center</MenuItemLabel>
-          </MenuItem>
-          <MenuSeparator />
+    
           <MenuItem key="Logout" textValue="Logout" className="p-2">
             <MenuItemLabel size="sm">Logout</MenuItemLabel>
           </MenuItem>
+          
         </Menu>
       </View>
-      <View className={"flex flex-col items-center justify-end h-1/2 relative w-full"}>
+      <View className={"flex flex-col items-center justify-end h-1/2 relative w-full "}>
         {/* Search Bar */}
-        <Input className={`${Platform.OS === 'web' ? 'w-[50%]' : 'w-[80%]'} relative z-10`}>
+        <Input className={`${Platform.OS === 'web' ? 'w-[50%]' : 'w-[80%]'} relative z-10 border-blue-800`}>
           <InputField
             onChangeText={handleInputChange}
             value={query}
-            placeholder="Search station..."
+            placeholder="Search station to order Prasadam"
             className="pl-4 pr-12"
           />
 

@@ -33,14 +33,15 @@ function CustomMenu() {
 
       if (userSnap.exists() && userSnap.data().role === 'admin') {
         setModalVisible(false); // Close modal
-        console.log("kuch gadwad hai")
         router.push('/Approval'); // Navigate to admin page
-      } else {
-        Alert.alert('Access Denied', 'You are not an admin.');
+      } 
+      else {
+        console.log("kuch gadwad hai")
+        alert('Access Denied', 'You are not an admin.');
       }
     } catch (error) {
-      console.error('Login Error:', error);
-      Alert.alert('Error', error.message);
+      alert('Access Denied', 'You are not an admin.');
+      
     }
   };
 

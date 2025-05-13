@@ -22,16 +22,19 @@ import {StyleSheet} from 'react-native';
         alignItems: 'center',
         justifyContent:'center', 
     },
-    // menu:{
-    //     display:'flex',
-    //      flexDirection:'row',
-    //     flex:1,
-    //     justifyContent:'center',
-    //     width: "100%",
-    //     fontFamily:'Times New Roman, Times, serif',
-    //     fontSize:'25px',
-       
-    // },
+    
+    bottomButtonContainer: {
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#007bff',
+        padding: 10,
+        borderRadius: 5,
+        
+      },
     list:{
         flexDirection:"row",
         flex:1,
@@ -102,14 +105,20 @@ import {StyleSheet} from 'react-native';
         height: 200,
         borderWidth:'2px',
         borderColor:'grey',
-        borderRadius:"50%",
+        borderRadius:"40%",
+        justifyContent:'center',
+        alignContent:'center',
     },
     imgBlock:{
         marginTop:10,
         borderWidth:'0.5px',
         padding:20,
         borderRadius:'20px',
-        // backgroundColor:'hsl(287, 100%, 70%)',
+        justifyContent:'center',
+        alignContent:'center',
+        alignItems:'center',
+        borderColor:'#007bff',
+        
     },
     vendorName:{
         justifyContent:'center',
@@ -118,5 +127,12 @@ import {StyleSheet} from 'react-native';
         marginTop:'10px',
         fontFamily:'Roman'
     },
+    addButtonText: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
+    addButton: {
+        backgroundColor: '#007bff',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+      },
 })
 export default styles;

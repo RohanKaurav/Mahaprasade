@@ -75,7 +75,7 @@ export default function Login_page() {
       const response = await fetch(imageUri);
       const blob = await response.blob();
 
-       const fileName = `images/${Date.now()}.jpg`;
+       const fileName = `vendorImages/${Date.now()}.jpg`;
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, blob);
 
@@ -197,7 +197,7 @@ export default function Login_page() {
             </Heading>
 
             <VStack space="xs">
-              <Text className="text-sm text-gray-600 mb-1">Mobile No.</Text>
+              <Text className="text-sm text-gray-600 mb-1">Whatsapp No.</Text>
               <Input>
                 <InputField
                   type="text"

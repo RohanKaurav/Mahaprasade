@@ -1,4 +1,4 @@
-import {Image, StyleSheet, Platform, View, Text, Button,TouchableOpacity,ScrollView,Linking, } from 'react-native';
+import {Image, StyleSheet, Platform, Pressable,View, Text, Button,TouchableOpacity,ScrollView,Linking, } from 'react-native';
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -10,7 +10,7 @@ import {Actionsheet,ActionsheetBackdrop,ActionsheetContent,
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper, ActionsheetItem, ActionsheetItemText,ActionsheetIcon,
 } from '@/components/ui/actionsheet';
-import { db } from '../firebase_config';
+import { db,storage } from '../firebase_config';
 import { getDocs, collection } from "firebase/firestore";
 
 
@@ -40,21 +40,19 @@ export default function VendorDesciption() {
     fetchVendorData();
   }, []);
 
-  // Update the selectedItemsString when myItems changes
   useEffect(() => {
     if (myItems.length > 0) {
-      setSelectedItemsString(myItems.join(', ')); // Format the selected items as a string
+      setSelectedItemsString(myItems.join(', ')); 
     } else {
-      setSelectedItemsString(''); // Reset the string if no items
+      setSelectedItemsString(''); 
     }
-  }, [myItems]); // Watch for changes in myItems
+  }, [myItems]); 
 
   const index=vendorData.findIndex(vendor=>vendor.id===(vendor_id));
      if (index === -1) {
         return <Text>Vendor  not found</Text>;
    }
-  
-  
+
   
   //Function to add items to the list
   function itemsInstring(itm) {
@@ -111,13 +109,18 @@ export default function VendorDesciption() {
       <View >
         <View style={styles.contnt}>
         <View style={styles.imgBlock}>
-        <Image style={styles.img}
-                        alt="hari bol" 
-                        source={{ uri: vendorData[index].img }} 
-                        
-        />
+        {vendorData[index].imageurl ? (
+            <Image
+              style={styles.img}
+              alt="Vendor Image"
+              source={{ uri: vendorData[index].imageurl }}
+            />
+            
+          ) : (
+            <Text>No image available</Text>
+          )}
         <Text style={styles.vendorName} >{(vendorData[index].name).toUpperCase()}</Text>
-        </View>      
+              
 
         <View   style={styles.bdy} className={`${Platform.OS === 'web' ? 'w-[100%]' : 'w-[100%]'}`}>
           <View >
@@ -127,7 +130,7 @@ export default function VendorDesciption() {
               <View style={styles.list} key={items.name}>
                 <View style={{ flex: 1 ,width: "100%" }}>
                 <Text className="text-lg font-bold text-gray-800" style={{fontWeight:'bold',width: "100%",fontSize:'20px', marginBottom:'20px' }}>
-                  {items.name} 
+                  {items.name.toUpperCase()} 
                 </Text>
                  <Text>Items: {items.description}       Prices: {items.price}</Text>
                 
@@ -188,12 +191,19 @@ export default function VendorDesciption() {
             ))}
           </View>
         </View>   
-        
+        </View>
       </View>
       {Object.values(count).some(quantity => quantity > 0) && (
         <>
-        <Button title='See Your Items' onPress={() => setShowActionsheet(true)}>
-      </Button>
+        <br></br>
+        
+                 <Pressable
+                    style={[styles.bottomButtonContainer]}
+                    onPress={() => setShowActionsheet(true)}
+                  >
+                    <Text className="text-gray-800">See Your Items</Text>
+                  </Pressable>
+                  
       <Actionsheet isOpen={showActionsheet} onClose={handleClose}>
         <ActionsheetBackdrop />
         <ActionsheetContent>
@@ -213,25 +223,53 @@ export default function VendorDesciption() {
             <ActionsheetItemText>Cost: ₨{totalCost}</ActionsheetItemText>
           </ActionsheetItem>
 
-          <ActionsheetItem
-            onPress={() => {
-            const phoneNumber = vendorData[index].contact; // Vendor's WhatsApp number from JSON
+                  <ActionsheetItem
+          onPress={async () => {
+            const rawNumber = vendorData[index].contact;
+            const countryCode = '91'; // change if needed
+            const phoneNumber = `${countryCode}${rawNumber}`;
             const orderDetails = Object.entries(count)
-            .map(([itemName, quantity]) => `${itemName}: ${quantity}`)
-            .join('\n'); // Format selected items as a list
+              .map(([itemName, quantity]) => `${itemName}: ${quantity}`)
+              .join('\n');
+            const message = encodeURIComponent(
+              `Hello, I would like to place an order:\n\n${orderDetails}\n\nTotal Cost: ₨${totalCost}`
+            );
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+            const smsUrl = `sms:${phoneNumber}?body=${message}`;
+            const telUrl = `tel:${phoneNumber}`;
 
-             const message = encodeURIComponent(
-            `Hello, I would like to place an order:\n\n${orderDetails}\n\nTotal Cost: ₨${totalCost}`
-          ); // Encode message for URL compatibility
+            try {
+              const supported = await Linking.canOpenURL(whatsappUrl);
+              if (supported) {
+                await Linking.openURL(whatsappUrl);
+              } else {
+                throw new Error('WhatsApp not supported');
+              }
+            } catch (error) {
+              Alert.alert(
+                'Vendor Not on WhatsApp',
+                'This vendor may not be using WhatsApp. You can try contacting them through the options below:',
+                [
+                  {
+                    text: 'Call Vendor',
+                    onPress: () => Linking.openURL(telUrl),
+                  },
+                  {
+                    text: 'Send SMS',
+                    onPress: () => Linking.openURL(smsUrl),
+                  },
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                ]
+              );
+            }
+          }}
+        >
+          <ActionsheetItemText>Order Now</ActionsheetItemText>
+        </ActionsheetItem>
 
-          const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`; // Construct WhatsApp URL
-          
-          Linking.openURL(whatsappUrl) // Open WhatsApp
-            .catch(err => console.error('An error occurred', err));
-        }}
-      >
-        <ActionsheetItemText>Order Now</ActionsheetItemText>
-    </ActionsheetItem>
 
           <ActionsheetItem  onPress={handleClose}>
             <ActionsheetItemText>Cancel</ActionsheetItemText>
