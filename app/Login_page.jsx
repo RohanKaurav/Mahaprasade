@@ -1,11 +1,12 @@
-import { Image, View, Text, TouchableOpacity, TextInput } from "react-native";
+import { Image, View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useState, useEffect } from "react";
-import { useLocalSearchParams, router } from "expo-router";
+import { router } from "expo-router";
 import { db, storage } from "../app/firebase_config";
-import { getDocs, collection, addDoc,doc,getDoc,updateDoc,arrayUnion  } from "firebase/firestore";
+import { getDocs, collection, addDoc, doc, updateDoc, arrayUnion, query, where } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import * as ImagePicker from "expo-image-picker";
-import { Picker } from '@react-native-picker/picker';
+import * as ImageManipulator from "expo-image-manipulator";
+import { Picker } from "@react-native-picker/picker";
 import { Button, ButtonText } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form-control";
 import { VStack } from "@/components/ui/vstack";
@@ -13,177 +14,147 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input";
 import { EyeOffIcon, EyeIcon } from "@/components/ui/icon";
 
-export default function Login_page() {
+export default function LoginPage() {
   const [mobNum, setMobNum] = useState("");
   const [passWord, setPassWord] = useState("");
-  const [confPass, setConfpass] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [typeofUser, setType0fUser] = useState("Login");
-  const [sign, setSign] = useState("Sign In");
-  const [Vendor, setVendor] = useState("New Vendor");
-  const [totalData, setTotalData] = useState([]);
+  const [typeOfUser, setTypeOfUser] = useState("Login");
+  const [authButtonText, setAuthButtonText] = useState("Sign In");
+  const [toggleToSignUpText, setToggleToSignUpText] = useState("New Vendor");
+  const [totalVendors, setTotalVendors] = useState([]);
   const [imageUri, setImageUri] = useState(null);
   const [stations, setStations] = useState([]);
   const [selectedStation, setSelectedStation] = useState("");
-  const [newStationName,setNewStationName]=useState("");
-  // Fetch vendors from Firestore
+  const [newStationName, setNewStationName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
-    const fetchVendors = async () => {
-      const snapshot = await getDocs(collection(db, "vendors"));
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setTotalData(data);
-    };
+    const fetchInitialData = async () => {
+      const vendorSnapshot = await getDocs(collection(db, "vendors"));
+      setTotalVendors(vendorSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
 
-    const fetchStations = async () => {
-      const snapshot = await getDocs(collection(db, "stations"));
-      const data = snapshot.docs.map((doc) => ({
-        id:doc.id,
-        ...doc.data(),
-      }));
-      setStations(data);
+      const stationSnapshot = await getDocs(collection(db, "stations"));
+      setStations(stationSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     };
-
-    fetchVendors();
-    fetchStations();
+    fetchInitialData();
   }, []);
 
-  const handleState = () => {
-    setShowPassword(!showPassword);
-  };
+  const handleState = () => setShowPassword(!showPassword);
 
-  // Pick image from gallery
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      const compressed = await ImageManipulator.manipulateAsync(
+        result.assets[0].uri,
+        [{ resize: { width: 800 } }],
+        { compress: 0.6, format: ImageManipulator.SaveFormat.JPEG }
+      );
+      setImageUri(compressed.uri);
     }
   };
 
-  // Upload image to Firebase Storage
-  const uploadImageToFirebase = async (imageUri) => {
-    if (!imageUri) return null;
+  const normalizeNumber = (num) => num.replace(/^\+91|^0/, "").trim();
+
+  const uploadImageToFirebase = async (uri) => {
+    if (!uri) return { downloadURL: "", filePath: "" };
 
     try {
-      const response = await fetch(imageUri);
+      const response = await fetch(uri);
       const blob = await response.blob();
-
-       const fileName = `vendorImages/${Date.now()}.jpg`;
-      const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, blob);
-
-      await uploadTask;
+      const filePath = `vendorImages/${Date.now()}.jpg`;
+      const storageRef = ref(storage, filePath);
+      await uploadBytesResumable(storageRef, blob);
       const downloadURL = await getDownloadURL(storageRef);
-      return downloadURL;
+      return { downloadURL, filePath };
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Image upload failed!");
-      return null;
+      return { downloadURL: "", filePath: "" };
     }
   };
 
+  const isValidPhone = (num) => /^(\+91[\-\s]?)?[0]?(91)?[6789]\d{9}$/.test(num);
+
   const handleSubmit = async () => {
-    if (!mobNum.trim() || !passWord.trim()) {
-      alert("Mobile number and password are required");
-      return;
-    }
-  
-    if (typeofUser === "Make New Account" && passWord !== confPass) {
-      alert("Password and Confirm Password do not match");
-      return;
-    }
-  
-    setShowPassword(false);
-  
-    if (typeofUser === "Login") {
-      const vendor = totalData.find(
-        (v) => v.contact === mobNum && v.password === passWord
-      );
-      if (vendor) {
-        router.push(`/vndor_cardlog/${vendor.id}`);
+    const normalizedMob = normalizeNumber(mobNum);
+    if (!normalizedMob || !passWord.trim()) return alert("Mobile number and password are required");
+    if (!isValidPhone(mobNum)) return alert("Enter a valid Indian mobile number");
+    if (typeOfUser === "Make New Account" && passWord !== confirmPassword) return alert("Passwords do not match");
+
+    setIsSubmitting(true);
+    try {
+      if (typeOfUser === "Login") {
+        const vendor = totalVendors.find(
+          (v) => normalizeNumber(v.contact) === normalizedMob && v.password === passWord
+        );
+        if (vendor) {
+          router.push(`/vndor_cardlog/${vendor.id}`);
+          setMobNum(""); setPassWord("");
+        } else {
+          alert("Invalid Mobile Number or Password");
+        }
       } else {
-        alert("Invalid Mobile Number or Password");
-      }
-    } else {
-      const existingVendor = totalData.find((v) => v.contact === mobNum);
-      if (existingVendor) {
-        alert("This mobile number is already registered. Please use a different number.");
-        return;
-      }
-  
-      let stationId = selectedStation;
-  
-      if (selectedStation === "other" && newStationName.trim() !== "") {
-        try {
+        const q = query(collection(db, "vendors"), where("contact", "==", normalizedMob));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) return alert("This mobile number is already registered.");
+
+        let stationId = selectedStation;
+        if (stationId === "other" && newStationName.trim()) {
           const newStationRef = await addDoc(collection(db, "stations"), {
             name: newStationName,
-            vendors: [],
+            vendors_list: [],
           });
           stationId = newStationRef.id;
           setStations([...stations, { id: stationId, name: newStationName }]);
-        } catch (error) {
-          console.error("🔥 Error adding new station:", error);
-          alert("Failed to add new station");
-          return;
         }
-      }
-  
-      try {
-        let uploadedImageUrl = "";
-        if (imageUri) {
-          uploadedImageUrl = await uploadImageToFirebase(imageUri);
-        }
-  
+
+        const { downloadURL, filePath } = await uploadImageToFirebase(imageUri);
+
         const newVendorRef = await addDoc(collection(db, "vendors"), {
-          contact: mobNum,
+          contact: normalizedMob,
           password: passWord,
           shopName: "",
           description: "",
-          imageurl: uploadedImageUrl,
+          imageurl: downloadURL,
+          imagePath: filePath,
           station: stationId,
         });
-  
-        console.log("✅ Vendor added with ID:", newVendorRef.id);
-  
+
         const stationRef = doc(db, "stations", stationId);
-        const stationSnap = await getDoc(stationRef);
-  
-        if (stationSnap.exists()) {
-          await updateDoc(stationRef, {
-            vendors_list: arrayUnion(newVendorRef.id),
-          });
-          console.log("✅ Vendor linked to station:", stationId);
-        } else {
-          console.warn("⚠️ Station not found in Firestore:", stationId);
-        }
-  
-        // If everything was successful, don't show an error
-        alert("Account created successfully!");
+        await updateDoc(stationRef, { vendors_list: arrayUnion(newVendorRef.id) });
+
+        alert("Account created successfully! Wait for admin approval.");
+
+        setMobNum("");
+        setPassWord("");
+        setConfirmPassword("");
+        setImageUri(null);
+        setSelectedStation("");
+        setNewStationName("");
+
         router.push(`/vndor_cardlog/${newVendorRef.id}`);
-      } catch (error) {
-        console.error("🔥 Error in vendor registration:", error);
-        alert(`Failed to create account: ${error.message}`);
       }
+    } catch (error) {
+      console.error("Error during submission:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
-  
-  
-  
 
   const handleNewVendorClick = () => {
-    setType0fUser("Make New Account");
-    setSign("Sign Up");
-    setVendor("");
-    setPassWord("");
+    setTypeOfUser("Make New Account");
+    setAuthButtonText("Sign Up");
+    setToggleToSignUpText("");
     setMobNum("");
-    setConfpass("");
+    setPassWord("");
+    setConfirmPassword("");
     setImageUri(null);
   };
 
@@ -193,17 +164,13 @@ export default function Login_page() {
         <FormControl className="bg-white rounded-lg p-4 shadow-lg">
           <VStack space="xs">
             <Heading className="text-center text-xl font-bold mb-4 text-typography-900">
-              {typeofUser}
+              {typeOfUser}
             </Heading>
 
             <VStack space="xs">
               <Text className="text-sm text-gray-600 mb-1">Whatsapp No.</Text>
               <Input>
-                <InputField
-                  type="text"
-                  value={mobNum}
-                  onChangeText={(text) => setMobNum(text)}
-                />
+                <InputField type="text" value={mobNum} onChangeText={setMobNum} />
               </Input>
             </VStack>
 
@@ -213,7 +180,7 @@ export default function Login_page() {
                 <InputField
                   type={showPassword ? "text" : "password"}
                   value={passWord}
-                  onChangeText={(text) => setPassWord(text)}
+                  onChangeText={setPassWord}
                 />
                 <InputSlot onPress={handleState}>
                   <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
@@ -221,55 +188,43 @@ export default function Login_page() {
               </Input>
             </VStack>
 
-            {typeofUser === "Make New Account" && (
+            {typeOfUser === "Make New Account" && (
               <>
                 <VStack space="xs">
-                  <Text className="text-sm text-gray-600 mb-1">
-                    Confirm Password
-                  </Text>
+                  <Text className="text-sm text-gray-600 mb-1">Confirm Password</Text>
                   <Input>
                     <InputField
                       type={showPassword ? "text" : "password"}
-                      value={confPass}
-                      onChangeText={(text) => setConfpass(text)}
+                      value={confirmPassword}
+                      onChangeText={setConfirmPassword}
                     />
                   </Input>
                 </VStack>
-               
-                <VStack space="xs">
-                        <Text className="text-sm text-gray-600 mb-1">Select Station</Text>
-                        <View className="border border-gray-300 rounded-md bg-white px-3 py-2">
-                          <Picker
-                            selectedValue={selectedStation}
-                            onValueChange={(itemValue) => setSelectedStation(itemValue)}
-                          >
-                            <Picker.Item label="Select Station" value="" />
-                            {stations.map((station) => (
-                              <Picker.Item key={station.id} label={station.name} value={station.id} />
-                            ))}
-                            <Picker.Item label="Other (Add New Station)" value="other" />
-                          </Picker>
-                        </View>
-                      </VStack>
 
-                      {selectedStation === "other" && (
-                        <VStack space="xs">
-                          <Text className="text-sm text-gray-600 mb-1">Enter New Station Name</Text>
-                          <Input>
-                            <InputField
-                              type="text"
-                              value={newStationName}
-                              onChangeText={(text) => setNewStationName(text)}
-                            />
-                          </Input>
-                        </VStack>
-                      )}
-
-                
                 <VStack space="xs">
-                  <Text className="text-sm text-gray-600 mb-1">
-                    Upload Image
-                  </Text>
+                  <Text className="text-sm text-gray-600 mb-1">Select Station</Text>
+                  <View className="border border-gray-300 rounded-md bg-white px-3 py-2">
+                    <Picker selectedValue={selectedStation} onValueChange={setSelectedStation}>
+                      <Picker.Item label="Select Station" value="" />
+                      {stations.map((station) => (
+                        <Picker.Item key={station.id} label={station.name} value={station.id} />
+                      ))}
+                      <Picker.Item label="Other (Add New Station)" value="other" />
+                    </Picker>
+                  </View>
+                </VStack>
+
+                {selectedStation === "other" && (
+                  <VStack space="xs">
+                    <Text className="text-sm text-gray-600 mb-1">Enter New Station Name</Text>
+                    <Input>
+                      <InputField type="text" value={newStationName} onChangeText={setNewStationName} />
+                    </Input>
+                  </VStack>
+                )}
+
+                <VStack space="xs">
+                  <Text className="text-sm text-gray-600 mb-1">Upload Image</Text>
                   <TouchableOpacity onPress={pickImage} className="bg-gray-200 p-2 rounded-md">
                     <Text className="text-center">Select Image</Text>
                   </TouchableOpacity>
@@ -280,14 +235,18 @@ export default function Login_page() {
               </>
             )}
 
-            <Button className="bg-blue-500 rounded-md py-2 mt-4" onPress={handleSubmit}>
-              <ButtonText>{sign}</ButtonText>
+            <Button className="bg-blue-500 rounded-md py-2 mt-4" onPress={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <ButtonText>{authButtonText}</ButtonText>
+              )}
             </Button>
           </VStack>
         </FormControl>
 
         <TouchableOpacity onPress={handleNewVendorClick} className="mt-4">
-          <Text className="text-center text-blue-500 font-medium">{Vendor}</Text>
+          <Text className="text-center text-blue-500 font-medium">{toggleToSignUpText}</Text>
         </TouchableOpacity>
       </View>
     </View>

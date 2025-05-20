@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Image, Pressable ,TextInput,Input} from 'react-native';
+import { View, Text, FlatList,} from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import VendorCard from '../../components/VendorCard';
 import { Icon } from '@/components/ui/icon';
@@ -7,20 +7,12 @@ import { ArrowLeftIcon } from '@/components/ui/icon';
 import { db } from '../firebase_config';
 import { getDocs, collection } from "firebase/firestore";
 import {useEffect, useState} from 'react'
-
-import {
-    Button,
-    ButtonText,
-    ButtonSpinner,
-    ButtonIcon,
-    ButtonGroup,
-  } from "@/components/ui/button"
+import { Button, } from "@/components/ui/button"
 
 function StationDetails() {
-    const  {id} = useLocalSearchParams() // Retrieve the dynamic station ID from the route
-
-    const [stationData, setStationData] = useState([]); // useState to set station data
-    const [vendorData, setVendorData] = useState([]); // useState to set vendor data
+    const  {id} = useLocalSearchParams() 
+    const [stationData, setStationData] = useState([]); 
+    const [vendorData, setVendorData] = useState([]); 
 
     useEffect(() => {
         const fetchStations = async () => {
@@ -62,7 +54,7 @@ function StationDetails() {
         }
     
         
-    const vendors = vendorData.filter((vendor) =>
+        const vendors = vendorData.filter((vendor) =>
         station.vendors_list.includes(vendor.id)
     );
 

@@ -15,12 +15,18 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "notification": {
+        "vapidPublicKey": "BNCQwMFUY8hwKwNDCvfeskhv-yYTKC6gXoYw-UgA8KQ_rl7cFd0K9yN_ILl_ws3izJ5ZJxaE_Sk48YaCTS-ejW4",
+        "serviceWorkerPath": "expo-notifications-sw.js"
+      }
     },
     "plugins": [
       "expo-router",
@@ -31,6 +37,14 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#ffffff",
+          "sounds": ["default"]
         }
       ]
     ],

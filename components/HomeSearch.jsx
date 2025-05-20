@@ -5,23 +5,14 @@ import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import { SearchIcon, CloseIcon, MenuIcon } from '@/components/ui/icon';
 import { db } from "../app/firebase_config";
 import { getDocs, collection } from "firebase/firestore";
-import { Button, ButtonText, ButtonIcon } from './ui/button';
-import { Icon } from '@/components/ui/icon';
-import { Badge, BadgeText } from "@/components/ui/badge";
-import {
-  Menu,
-  MenuItem,
-  MenuItemLabel,
-  MenuSeparator
-} from '@/components/ui/menu';
+import {Menu,MenuItem,MenuItemLabel,MenuSeparator} from '@/components/ui/menu';
 
 function HomeSearch() {
-  const [query, setQuery] = useState(''); // Keeps track of user input
-  const [filterData, setFilterData] = useState([]); // The filtered data array
-  const [totalData, setTotalData] = useState([]); // Holds all station data
-  const router = useRouter(); // For navigation
+  const [query, setQuery] = useState(''); 
+  const [filterData, setFilterData] = useState([]); 
+  const [totalData, setTotalData] = useState([]); 
+  const router = useRouter(); 
 
-  // Fetch data from Firestore on component mount
   useEffect(() => {
     const fetchStations = async () => {
       const snapshot = await getDocs(collection(db, 'stations'));
@@ -35,19 +26,17 @@ function HomeSearch() {
     fetchStations();
   }, []);
 
-  // Handle input change in the search bar
   const handleInputChange = (text) => {
     setQuery(text);
     handleSearchQuery(text);
   };
 
-  // Handle the search query and filter the data
   function handleSearchQuery(text) {
-    text = text.toLowerCase(); // Convert text to lowercase for case-insensitive comparison
+    text = text.toLowerCase(); 
     const filteredArray = totalData.filter((item) =>
       item.name.toLowerCase().includes(text)
     );
-    setFilterData(filteredArray); // Update the filtered data
+    setFilterData(filteredArray); 
   }
 
   function clearQuery() {
@@ -65,7 +54,7 @@ function HomeSearch() {
           trigger={({ ...triggerProps }) => {
             return (
               <Pressable {...triggerProps} className="bg-transparent border-0 p-0 active:bg-transparent focus:bg-transparent border-gray-300">
-                <MenuIcon className="text-typography-500 w-6 h-6" />
+                <MenuIcon className="text-typography-500 w-10 h-10" />
               </Pressable>
             );
           }}
@@ -106,8 +95,16 @@ function HomeSearch() {
         </Menu>
       </View>
       <View className={"flex flex-col items-center justify-end h-1/2 relative w-full "}>
-        {/* Search Bar */}
-        <Input className={`${Platform.OS === 'web' ? 'w-[50%]' : 'w-[80%]'} relative z-10 border-blue-800`}>
+      <View style={{
+          width:'80%',
+          zIndex: 10,
+          position: 'relative',
+          borderRadius:5,
+          borderColor:"blue",
+          borderWidth: 1, 
+          
+        }} >
+        <Input >
           <InputField
             onChangeText={handleInputChange}
             value={query}
@@ -128,7 +125,7 @@ function HomeSearch() {
             )}
           </InputSlot>
         </Input>
-
+        </View>
         {/* Dropdown Results */}
         {query.trim().length > 0 && (
           <View
@@ -141,7 +138,7 @@ function HomeSearch() {
                 renderItem={({ item }) => (
                   <Pressable
                     className="p-3 border-b border-gray-200"
-                    onPress={() => router.push(`/station/${item.id}`)}
+                    onPress={() => router.push(`/station/${item.id}`,setQuery('')) }
                   >
                     <Text className="text-gray-800">{item.name}</Text>
                   </Pressable>

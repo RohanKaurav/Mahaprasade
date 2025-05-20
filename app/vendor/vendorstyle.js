@@ -1,138 +1,84 @@
-import {StyleSheet} from 'react-native';
- const styles=StyleSheet.create({
-    bdy:{
-          flex:1,
-           width: "100%", // Ensures full width
-          padding:"10px",
-          margin:5,
-          paddingBottom:'15px',
-          borderColor: "black",
-          borderWidth: 0,
-          borderTopStartRadius: 10,
-          borderTopEndRadius: 10,
-          padding: 10,
-          borderBottomWidth:'0px',
-        
-        
-    },
-   
-    contnt:{
-         flex: 1,
-        height:"100vh",
-        alignItems: 'center',
-        justifyContent:'center', 
-    },
-    
-    bottomButtonContainer: {
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#007bff',
-        padding: 10,
-        borderRadius: 5,
-        
-      },
-    list:{
-        flexDirection:"row",
-        flex:1,
-        width:'100%',
-        minHeight:100,
-        fontFamily:"sans serif",
-        padding:"5px",
-        marginTop:'0px',
-        marginBottom:'0px',
-        borderColor:'grey',
-        borderWidth:.25,
-        borderLeftWidth:'0px',
-        borderRightWidth:'0px',
-        // borderRadius:'5px',
-        paddingRight:'0',
+import { StyleSheet } from 'react-native';
 
-       
-    },
-    buttn:{
-        flexDirection: 'row', 
+export default StyleSheet.create({
+    container: {
+        flexGrow: 1,
         alignItems: 'center',
-        //justifyContent: 'flex-end', // Pushes content to the right
-        borderWidth:'2px',
-        borderColor:'grey',
-        borderRadius:10,
-        padding:'10px',
-        // paddingHorizontal: 10,
-        marginLeft:5,
-        marginBottom:'3px',
-        marginRight:'3px',
-        
-       
-    },
-    
-    btn_pls:{
-       backgroundColor:'none',
-       marginBottom:'2px',
-       marginLeft:"5px",
-       fontWeight:'bold',
-       fontSize:20,
-       color:'green',
-       alignItems: 'center',
-       justifyContent:'center', 
-       
-    },
-    btn_mns:{
-        backgroundColor:'none',
-        color:'red',
-        fontWeight:'bold',
-        fontSize:20,
-        marginRight:"5px",
-        alignItems: 'center',
-        justifyContent:'center', 
-        padding:'2px',
-    },
-    addbtn:{
-        borderRadius:"5px",
-        padding:'2px',
-        marginRight:'2px',
-        fontSize:30,
-        alignItems: 'center',
-        justifyContent:'center', 
-        fontWeight:'bold',
-        
-    },
-    img:{
-        width: 200, 
-        height: 200,
-        borderWidth:'2px',
-        borderColor:'grey',
-        borderRadius:"40%",
-        justifyContent:'center',
-        alignContent:'center',
-    },
-    imgBlock:{
-        marginTop:10,
-        borderWidth:'0.5px',
-        padding:20,
-        borderRadius:'20px',
-        justifyContent:'center',
-        alignContent:'center',
-        alignItems:'center',
-        borderColor:'#007bff',
-        
-    },
-    vendorName:{
-        justifyContent:'center',
-        alignContent:'center',
-        textAlign:'center',
-        marginTop:'10px',
-        fontFamily:'Roman'
-    },
-    addButtonText: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
-    addButton: {
-        backgroundColor: '#007bff',
-        padding: 10,
-        borderRadius: 5,
+        padding: 6,
+        backgroundColor: '#f5f5f5',
+      },
+      contentWrapper: {
+        width: '100%',
+        maxWidth: 600,
         alignItems: 'center',
       },
-})
-export default styles;
+      vendorImage: {
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        marginBottom: 16,
+      },
+      vendorName: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 16,
+      },
+      menuCard: {
+        backgroundColor: '#ffffff',
+        padding: 16,
+        marginVertical: 10,
+        width: '100%',
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 6,
+        elevation: 4,
+      },
+      menuTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 6,
+      },
+      menuDetails: {
+        fontSize: 14,
+        marginBottom: 10,
+      },
+      buttonRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+      },
+      addButton: {
+        backgroundColor: '#FF914D',
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      circleButton: {
+        backgroundColor: '#ccc',
+        borderRadius: 20,
+        width: 30,
+        height: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      buttonText: {
+        fontWeight: 'bold',
+        fontSize: 16,
+      },
+      bottomButtonContainer: {
+        backgroundColor: '#FF914D',
+        padding: 14,
+        marginTop: 5,
+        borderRadius: 12,
+        zIndex:10,
+        elevation:5,        
+      },
+      bottomButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        textAlign: 'center'      },
+    });
