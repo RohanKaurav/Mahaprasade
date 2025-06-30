@@ -5,7 +5,7 @@ export default StyleSheet.create({
         flexGrow: 1,
         alignItems: 'center',
         padding: 6,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#FFF7C0',
       },
       contentWrapper: {
         width: '100%',
@@ -70,7 +70,7 @@ export default StyleSheet.create({
         fontSize: 16,
       },
       bottomButtonContainer: {
-        backgroundColor: '#FF914D',
+        backgroundColor: '#2196F3',
         padding: 14,
         marginTop: 5,
         borderRadius: 12,

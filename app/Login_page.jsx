@@ -1,5 +1,5 @@
-import { Image, View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
-import { useState, useEffect } from "react";
+import { Image, View, Text, TouchableOpacity, ActivityIndicator,Pressable } from "react-native";
+import { useState, useEffect,useContext } from "react";
 import { router } from "expo-router";
 import { db, storage } from "../app/firebase_config";
 import { getDocs, collection, addDoc, doc, updateDoc, arrayUnion, query, where } from "firebase/firestore";
@@ -13,6 +13,9 @@ import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input";
 import { EyeOffIcon, EyeIcon } from "@/components/ui/icon";
+import { AuthContext } from '../contexts/AuthContext';
+import { ArrowLeftIcon,Icon } from '@/components/ui/icon';
+
 
 export default function LoginPage() {
   const [mobNum, setMobNum] = useState("");
@@ -28,6 +31,8 @@ export default function LoginPage() {
   const [selectedStation, setSelectedStation] = useState("");
   const [newStationName, setNewStationName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useContext(AuthContext);
+
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -94,7 +99,8 @@ export default function LoginPage() {
           (v) => normalizeNumber(v.contact) === normalizedMob && v.password === passWord
         );
         if (vendor) {
-          router.push(`/vndor_cardlog/${vendor.id}`);
+          await login(vendor); 
+          router.replace(`/vndor_cardlog/${vendor.id}`);
           setMobNum(""); setPassWord("");
         } else {
           alert("Invalid Mobile Number or Password");
@@ -129,6 +135,11 @@ export default function LoginPage() {
         const stationRef = doc(db, "stations", stationId);
         await updateDoc(stationRef, { vendors_list: arrayUnion(newVendorRef.id) });
 
+        await login({ id: newVendorRef.id, contact: normalizedMob }); 
+
+         router.replace(`/vndor_cardlog/${newVendorRef.id}`);
+
+
         alert("Account created successfully! Wait for admin approval.");
 
         setMobNum("");
@@ -159,6 +170,38 @@ export default function LoginPage() {
   };
 
   return (
+    <> <View style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#2196F3',
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      elevation: 4,
+      shadowColor: '#000',
+      shadowOpacity: 0.1,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4
+    }}>
+      <Pressable onPress={() => {
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.navigate('/');
+        }
+      }}>
+    <Icon as={ArrowLeftIcon} className="font-bold"/>
+    </Pressable>
+      <Text style={{
+        flex: 1,
+        textAlign: 'center',
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: 'black',
+        marginRight: 32, 
+      }}>
+        {`Welcome To Krishna's Family`}
+      </Text>
+    </View>
     <View className="flex-1 justify-center items-center bg-gray-100">
       <View className="w-full max-w-sm p-4">
         <FormControl className="bg-white rounded-lg p-4 shadow-lg">
@@ -250,5 +293,6 @@ export default function LoginPage() {
         </TouchableOpacity>
       </View>
     </View>
+    </>
   );
 }

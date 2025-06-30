@@ -5,61 +5,105 @@ import { getDocs, collection, updateDoc, doc } from 'firebase/firestore';
 import { Button, ButtonText } from '@/components/ui/button';
 
 function AdminVendorApproval() {
+  const [approvedVendors, setApprovedVendors] = useState([]);
   const [pendingVendors, setPendingVendors] = useState([]);
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Fetch pending vendor requests
   useEffect(() => {
-    const fetchPendingVendors = async () => {
+
+    const fetchVendors = async () => {
       const snapshot = await getDocs(collection(db, 'vendors'));
-      const data = snapshot.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter((vendor) => !vendor.isApproved);
-      setPendingVendors(data);
+      const allVendors = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const stationMap = await fetchStations();
+
+   
+    const vendorsWithStationNames = allVendors.map((vendor) => ({
+      ...vendor,
+      stationName: stationMap[vendor.station] || 'Unknown Station',
+    }));
+
+      setPendingVendors(vendorsWithStationNames.filter((v) => !v.isApproved));
+      setApprovedVendors(vendorsWithStationNames.filter((v) => v.isApproved));
     };
-    fetchPendingVendors();
+    fetchVendors();
   }, []);
 
-  // Approve vendor
-  const approveVendor = async (vendorId) => {
+const fetchStations = async () => {
+  const stationSnapshot = await getDocs(collection(db, 'stations'));
+  const stationMap = {};
+  stationSnapshot.docs.forEach((doc) => {
+    const data = doc.data();
+    const name = data.name;
+    const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+    stationMap[doc.id] = displayName;
+  });
+  return stationMap;
+};
+
+  const toggleApproval = async (vendorId, currentStatus) => {
     try {
-      await updateDoc(doc(db, 'vendors', vendorId), { isApproved: true });
-      setPendingVendors((prev) => prev.filter((vendor) => vendor.id !== vendorId));
+      await updateDoc(doc(db, 'vendors', vendorId), { isApproved: !currentStatus });
+
+      if (currentStatus) {
+        const updatedVendor = approvedVendors.find((v) => v.id === vendorId);
+        setApprovedVendors((prev) => prev.filter((v) => v.id !== vendorId));
+        setPendingVendors((prev) => [...prev, { ...updatedVendor, isApproved: false }]);
+      } else {
+        const updatedVendor = pendingVendors.find((v) => v.id === vendorId);
+        setPendingVendors((prev) => prev.filter((v) => v.id !== vendorId));
+        setApprovedVendors((prev) => [...prev, { ...updatedVendor, isApproved: true }]);
+      }
+
       setModalVisible(false);
     } catch (error) {
-      console.error('Error approving vendor:', error);
+      console.error('Error updating vendor:', error);
     }
   };
 
-  // Open modal with selected vendor
   const openVendorModal = (vendor) => {
     setSelectedVendor(vendor);
     setModalVisible(true);
   };
 
+  const renderVendorCard = (vendor) => (
+    <TouchableOpacity onPress={() => openVendorModal(vendor)}>
+      <View className="border p-4 mb-3 rounded bg-white shadow">
+        <Text className="text-lg font-semibold">{vendor.name}</Text>
+        <Text className="text-sm text-gray-500">Tap to view details</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <View className="p-4 bg-gray-100 h-full">
-      <Text className="text-xl font-bold mb-4">Pending Vendor Approvals</Text>
+      <ScrollView>
+       
+        <Text className="text-xl font-bold mb-2">🕒 Pending Vendors</Text>
+        {pendingVendors.length > 0 ? (
+          <FlatList
+            data={pendingVendors}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => renderVendorCard(item)}
+            scrollEnabled={false}
+          />
+        ) : (
+          <Text className="text-sm mb-4 text-gray-500">No pending vendors.</Text>
+        )}
 
-      {pendingVendors.length > 0 ? (
-        <FlatList
-          data={pendingVendors}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => openVendorModal(item)}>
-              <View className="border p-4 mb-3 rounded bg-white shadow">
-                <Text className="text-lg font-semibold">{item.name}</Text>
-                <Text className="text-sm text-gray-500">Tap to view details</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
-      ) : (
-        <Text>No pending vendor requests.</Text>
-      )}
-
-      {/* Modal for full vendor details */}
+        {/* Approved Section */}
+        <Text className="text-xl font-bold mt-6 mb-2">✅ Approved Vendors</Text>
+        {approvedVendors.length > 0 ? (
+          <FlatList
+            data={approvedVendors}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => renderVendorCard(item)}
+            scrollEnabled={false}
+          />
+        ) : (
+          <Text className="text-sm text-gray-500">No approved vendors.</Text>
+        )}
+      </ScrollView>
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -70,10 +114,10 @@ function AdminVendorApproval() {
             <>
               <Text className="text-xl font-bold mb-2">{selectedVendor.name}</Text>
               <Text className="text-sm mb-1">📞 {selectedVendor.contact}</Text>
+              <Text className="text-sm mb-1">🚉 {selectedVendor.stationName}</Text>
               <Text className="text-sm mb-1">🏠 {selectedVendor.address}</Text>
               <Text className="text-sm mb-2">📝 {selectedVendor.description}</Text>
 
-              {/* Menu */}
               {selectedVendor.menu?.length > 0 && (
                 <View className="mb-3">
                   <Text className="font-semibold text-base mb-2">🍽️ Menu:</Text>
@@ -86,7 +130,6 @@ function AdminVendorApproval() {
                 </View>
               )}
 
-              {/* Vendor Image */}
               {selectedVendor.imageurl && (
                 <View className="mb-3">
                   <Text className="text-sm font-medium mb-1">Vendor Image:</Text>
@@ -98,13 +141,15 @@ function AdminVendorApproval() {
                 </View>
               )}
 
-              {/* Buttons */}
+              
               <View className="flex flex-row justify-between mt-4">
                 <Button
-                  onPress={() => approveVendor(selectedVendor.id)}
-                  className="bg-green-500 w-[48%]"
+                  onPress={() => toggleApproval(selectedVendor.id, selectedVendor.isApproved)}
+                  className={`w-[48%] ${selectedVendor.isApproved ? 'bg-yellow-500' : 'bg-green-500'}`}
                 >
-                  <ButtonText className="text-white">Approve</ButtonText>
+                  <ButtonText className="text-white">
+                    {selectedVendor.isApproved ? 'Unapprove' : 'Approve'}
+                  </ButtonText>
                 </Button>
 
                 <Button

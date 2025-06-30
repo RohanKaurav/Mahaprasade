@@ -1,12 +1,13 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: { flex: 1, padding: 20 ,backgroundColor:'#FFF7C0'},
+  Container_header:{flex:1,padding:10},
   itemContainer: {
     marginBottom: 15,
     padding: 10,
     backgroundColor: '#f9f9f9',
-    borderRadius: 5,
+    borderRadius:10,
   },
   itemName: { fontSize: 18, fontWeight: 'bold' },
   addButton: {

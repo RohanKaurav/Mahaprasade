@@ -13,6 +13,9 @@ function StationDetails() {
     const  {id} = useLocalSearchParams() 
     const [stationData, setStationData] = useState([]); 
     const [vendorData, setVendorData] = useState([]); 
+    const [loadingStations, setLoadingStations] = useState(true);
+    const [loadingVendors, setLoadingVendors] = useState(true);
+
 
     useEffect(() => {
         const fetchStations = async () => {
@@ -22,6 +25,7 @@ function StationDetails() {
             id: doc.id,
           }));
           setStationData(data);
+          setLoadingStations(false);
         };
     
         fetchStations();
@@ -37,14 +41,21 @@ function StationDetails() {
             
           } )).filter((vendor) => vendor.isApproved);
           setVendorData(data);
+          setLoadingVendors(false)
         };
     
         fetchVendorData();
       }, []);
 
 
-      const station = stationData.find((item) => item.id === id);  // finding particular station object
-    
+      const station = stationData.find((item) => item.id === id); 
+      if (loadingStations || loadingVendors) {
+        return (
+            <View>
+                <Text>Loading...</Text>
+            </View>
+        );
+    }    
         if (!station) {
             return (
                 <View >
@@ -67,19 +78,19 @@ function StationDetails() {
                 router.navigate("/")
             }
             
-        }} style={{ backgroundColor: "#facc15", }}>
+        }} style={{ backgroundColor: "#2196F3", }}>
              <Icon as={ArrowLeftIcon} className="font-bold"/>
         </Button>,
                 headerTitle: station.name,
                 headerTitleStyle: {
-                    fontSize: 18, // text-lg => 1.125rem = 18px
-                    fontWeight: 'bold', // font-bold
-                    color: '#1F2937', // text-gray-800 => #1F2937
+                    fontSize: 18, 
+                    fontWeight: 'bold', 
+                    color: '#1F2937', 
                     textAlign: 'Center',
                   },
                   headerTitleAlign: 'center',
                   headerStyle: {
-                    backgroundColor: '#facc15', // Set background to white
+                    backgroundColor: '#2196F3', 
                   }
 
          }} />
@@ -87,6 +98,7 @@ function StationDetails() {
                     data={vendors}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => <VendorCard vendor={item} />}
+                    style={{backgroundColor: '#FFF7C0',}}
                 />
                 
         </>

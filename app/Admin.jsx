@@ -21,19 +21,17 @@ function CustomMenu() {
   const auth = getAuth();
   const firestore = getFirestore();
 
-  // Function to handle login
   const handleAdminLogin = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Fetch user role from Firestore
       const userRef = doc(firestore, 'users', user.uid);
       const userSnap = await getDoc(userRef);
 
       if (userSnap.exists() && userSnap.data().role === 'admin') {
-        setModalVisible(false); // Close modal
-        router.push('/Approval'); // Navigate to admin page
+        setModalVisible(false);
+        router.push('/Approval'); 
       } 
       else {
         console.log("kuch gadwad hai")

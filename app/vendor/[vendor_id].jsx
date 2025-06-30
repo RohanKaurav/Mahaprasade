@@ -1,5 +1,5 @@
 import { Image, Pressable, View, Text, TouchableOpacity, ScrollView, Linking, Alert } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams,Stack ,router} from 'expo-router';
 import { useState, useEffect } from 'react';
 import styles from "./vendorstyle.js";
 import {
@@ -9,6 +9,9 @@ import {
 } from '@/components/ui/actionsheet';
 import { db } from '../firebase_config';
 import { getDocs, collection } from 'firebase/firestore';
+import { ArrowLeftIcon,Icon } from '@/components/ui/icon';
+
+
 
 export default function VendorDescription() {
   const { vendor_id } = useLocalSearchParams();
@@ -16,6 +19,7 @@ export default function VendorDescription() {
   const [count, setCount] = useState({});
   const [showActionsheet, setShowActionsheet] = useState(false);
   const [vendorData, setVendorData] = useState([]);
+  const [loadVendors,setLoadvendor]=useState(true)
 
   const handleClose = () => setShowActionsheet(false);
 
@@ -27,12 +31,26 @@ export default function VendorDescription() {
         id: doc.id,
       }));
       setVendorData(data);
+      setLoadvendor(false)
     };
     fetchVendorData();
   }, []);
 
   const index = vendorData.findIndex((vendor) => vendor.id === vendor_id);
-  if (index === -1) return <Text>Vendor not found</Text>;
+  if(loadVendors){
+    return (
+      <View>
+          <Text>Loading...</Text>
+      </View>
+  );
+  }
+  if(index==-1){
+    return (
+      <View >
+          <Text style={{}}>Vendor Not Found</Text>
+      </View>
+    )
+  }
 
   const vendor = vendorData[index];
 
@@ -57,8 +75,42 @@ export default function VendorDescription() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 10, backgroundColor: '#f5f5f5' }}>
+    <>
+    <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#2196F3',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4
+      }}>
+        <Pressable onPress={() => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.navigate('/');
+          }
+        }}>
+      <Icon as={ArrowLeftIcon} className="font-bold"/>
+      </Pressable>
+        <Text style={{
+          flex: 1,
+          textAlign: 'center',
+          fontSize: 18,
+          fontWeight: 'bold',
+          color: 'black',
+          marginRight: 32, 
+        }}>
+          {vendor?.name || 'Vendor'}
+        </Text>
+      </View>
+
+    <View style={{ flex: 1 ,backgroundColor: '#FFF7C0'}}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 10, backgroundColor: '#FFF7C0' }}>
         <View style={styles.container}>
           <View style={styles.contentWrapper}>
             {vendor.imageurl ? (
@@ -66,12 +118,12 @@ export default function VendorDescription() {
             ) : (
               <Text>No image available</Text>
             )}
-            <Text style={styles.vendorName}>{vendor.name.toUpperCase()}</Text>
+            {/* <Text style={styles.vendorName}>{vendor.name.toUpperCase()}</Text> */}
 
             {vendor.menu.map((item) => (
               <View key={item.name} style={styles.menuCard}>
                 <Text style={styles.menuTitle}>{item.name.toUpperCase()}</Text>
-                <Text style={styles.menuDetails}>Items: {item.description} | Price: ₹{item.price}</Text>
+                <Text style={styles.menuDetails}>{item.description} | Price: ₹{item.price}</Text>
 
                 <View style={styles.buttonRow}>
                   {count[item.name] > 0 && (
@@ -181,5 +233,6 @@ export default function VendorDescription() {
         </>
       )}
     </View>
+    </>
   );
 }

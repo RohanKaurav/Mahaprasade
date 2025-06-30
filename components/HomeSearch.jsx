@@ -1,17 +1,19 @@
-import { Platform, View, Text, Keyboard, FlatList, Pressable } from 'react-native';
-import { useState, useEffect } from 'react';
+import { Platform, View, Text, Keyboard, FlatList, SectionList, Pressable } from 'react-native';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import { SearchIcon, CloseIcon, MenuIcon } from '@/components/ui/icon';
 import { db } from "../app/firebase_config";
 import { getDocs, collection } from "firebase/firestore";
-import {Menu,MenuItem,MenuItemLabel,MenuSeparator} from '@/components/ui/menu';
+import { Menu, MenuItem, MenuItemLabel, MenuSeparator } from '@/components/ui/menu';
 
 function HomeSearch() {
-  const [query, setQuery] = useState(''); 
-  const [filterData, setFilterData] = useState([]); 
-  const [totalData, setTotalData] = useState([]); 
-  const router = useRouter(); 
+  const [query, setQuery] = useState('');
+  const [filterData, setFilterData] = useState([]);
+  const [totalData, setTotalData] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const router = useRouter();
+  const sectionListRef = useRef(null);
 
   useEffect(() => {
     const fetchStations = async () => {
@@ -22,134 +24,165 @@ function HomeSearch() {
       }));
       setTotalData(data);
     };
-
     fetchStations();
   }, []);
 
   const handleInputChange = (text) => {
     setQuery(text);
-    handleSearchQuery(text);
+    setShowDropdown(true);
+    const filtered = totalData.filter((item) =>
+      item.name.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilterData(filtered);
   };
 
-  function handleSearchQuery(text) {
-    text = text.toLowerCase(); 
-    const filteredArray = totalData.filter((item) =>
-      item.name.toLowerCase().includes(text)
-    );
-    setFilterData(filteredArray); 
-  }
-
-  function clearQuery() {
+  const clearQuery = () => {
     setQuery('');
-    Keyboard.dismiss();
     setFilterData([]);
-  }
+    setShowDropdown(false);
+    Keyboard.dismiss();
+  };
+
+  const groupedStations = useMemo(() => {
+    const grouped = totalData.reduce((acc, item) => {
+      const letter = item.name[0].toUpperCase();
+      if (!acc[letter]) acc[letter] = [];
+      acc[letter].push(item);
+      return acc;
+    }, {});
+    return Object.keys(grouped)
+      .sort()
+      .map((letter) => ({
+        title: letter,
+        data: grouped[letter].sort((a, b) => a.name.localeCompare(b.name)),
+      }));
+  }, [totalData]);
 
   return (
-    <View className="h-full">
-      <View className="absolute top-0 left-0 z-10 bg-transparent ">
-        <Menu
-          offset={0}
-          className="bg-white border border-blue-600 rounded-md shadow-lg"
-          trigger={({ ...triggerProps }) => {
-            return (
-              <Pressable {...triggerProps} className="bg-transparent border-0 p-0 active:bg-transparent focus:bg-transparent border-gray-300">
-                <MenuIcon className="text-typography-500 w-10 h-10" />
+    <View style={{ flex: 1, backgroundColor: '#FFF7C0' }} pointerEvents="box-none">
+      
+      <View className="flex flex-row items-center w-full px-4 py-2" style={{ backgroundColor: '#2196F3' }}>
+        <View style={{ marginRight: 8 }}>
+          <Menu
+            offset={0}
+            className="bg-white border border-blue-600 rounded-md shadow-lg"
+            trigger={({ ...triggerProps }) => (
+              <Pressable {...triggerProps} className="bg-transparent p-0">
+                <MenuIcon className="text-black w-8 h-6" />
               </Pressable>
-            );
-          }}
-        >
-          <MenuItem
-            key="Membership"
-            textValue="Membership"
-            className="p-2 justify-between"
-            onPress={() => {
-              try {
-                router.push(`/Login_page`);
-              } catch (error) {
-                console.error("Navigation Error:", error);
-              }
-            }}
+            )}
           >
-            <MenuItemLabel size="sm">Vendor</MenuItemLabel>
+            <MenuItem onPress={() => router.push('/Login_page')}>
+              <MenuItemLabel size="sm">Vendor</MenuItemLabel>
+            </MenuItem>
             <MenuSeparator />
-          </MenuItem>
-          <MenuSeparator />
-          
-          <MenuSeparator />
-          <MenuItem
-              key="AdminPanel"
-              textValue="Admin Panel"
-              className="p-2"
-              onPress={() => router.push(`/Admin`)}
-            >
+            <MenuItem onPress={() => router.push('/Admin')}>
               <MenuItemLabel size="sm">Login as Admin</MenuItemLabel>
             </MenuItem>
             <MenuSeparator />
-
-    
-          <MenuItem key="Logout" textValue="Logout" className="p-2">
-            <MenuItemLabel size="sm">Logout</MenuItemLabel>
-          </MenuItem>
-          
-        </Menu>
-      </View>
-      <View className={"flex flex-col items-center justify-end h-1/2 relative w-full "}>
-      <View style={{
-          width:'80%',
-          zIndex: 10,
-          position: 'relative',
-          borderRadius:5,
-          borderColor:"blue",
-          borderWidth: 1, 
-          
-        }} >
-        <Input >
-          <InputField
-            onChangeText={handleInputChange}
-            value={query}
-            placeholder="Search station to order Prasadam"
-            className="pl-4 pr-12"
-          />
-
-          {/* Dynamic Icon at the end */}
-          <InputSlot className="absolute right-3 item-center">
-            {query.trim().length === 0 ? (
-              <Pressable>
-                <InputIcon as={SearchIcon} />
-              </Pressable>
-            ) : (
-              <Pressable onPress={clearQuery}>
-                <InputIcon as={CloseIcon} />
-              </Pressable>
-            )}
-          </InputSlot>
-        </Input>
+          </Menu>
         </View>
-        {/* Dropdown Results */}
-        {query.trim().length > 0 && (
-          <View
-            className={`${Platform.OS === 'web' ? 'w-[50%]' : 'w-[80%]'} bg-white rounded-lg border border-gray-300 shadow-md absolute top-full mt-2 z-20`}
-          >
-            {filterData.length > 0 ? (
+
+       
+        <View style={{ flex: 1 }} className="relative">
+          <Input>
+            <InputField
+              onChangeText={handleInputChange}
+              value={query}
+              onFocus={() => setShowDropdown(true)}
+              placeholder="Search station to order Prasadam"
+              className="pl-10 pr-12"
+              style={{
+                backgroundColor: '#FFF7C0',
+                borderRadius: 5,
+                borderWidth: 1,
+                borderColor: 'gray',
+              }}
+            />
+            <InputSlot className="absolute left-3">
+              {query.trim().length === 0 ? (
+                <Pressable>
+                  <InputIcon as={SearchIcon} />
+                </Pressable>
+              ) : (
+                <Pressable onPress={clearQuery}>
+                  <InputIcon as={CloseIcon} />
+                </Pressable>
+              )}
+            </InputSlot>
+          </Input>
+
+          
+          {showDropdown && query.trim().length > 0 && (
+            <View
+              style={{
+                position: 'absolute',
+                top: '100%',
+                marginTop: 6,
+                width: '100%',
+                backgroundColor: 'white',
+                borderColor: '#ccc',
+                borderWidth: 1,
+                borderRadius: 8,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.2,
+                shadowRadius: 1.41,
+                elevation: 3,
+                zIndex: 1001,
+              }}
+            >
               <FlatList
                 data={filterData}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={(item) => item.id}
+                keyboardShouldPersistTaps="always"
                 renderItem={({ item }) => (
                   <Pressable
                     className="p-3 border-b border-gray-200"
-                    onPress={() => router.push(`/station/${item.id}`,setQuery('')) }
+                    onPress={() => {
+                      router.push(`/station/${item.id}`);
+                      setQuery('');
+                      setShowDropdown(false);
+                      Keyboard.dismiss();
+                    }}
                   >
                     <Text className="text-gray-800">{item.name}</Text>
                   </Pressable>
                 )}
+                ListEmptyComponent={
+                  <Text className="p-4 text-gray-500">No matching station</Text>
+                }
               />
-            ) : (
-              <Text className="p-4 text-gray-500">No matching station</Text>
-            )}
-          </View>
-        )}
+            </View>
+          )}
+        </View>
       </View>
+
+      
+      {query.trim().length === 0 && (
+        <>
+          <SectionList
+            ref={sectionListRef}
+            sections={groupedStations}
+            keyExtractor={(item) => item.id}
+            stickySectionHeadersEnabled={true}
+            contentContainerStyle={{ paddingBottom: 80 }}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => router.push(`/station/${item.id}`)}
+                className="px-4 py-3 border-b border-gray-300"
+              >
+                <Text className="text-black text-base">{item.name.charAt(0).toUpperCase() + item.name.slice(1)}</Text>
+              </Pressable>
+            )}
+            renderSectionHeader={({ section: { title } }) => (
+              <View className="bg-blue-200 px-4 py-2 mt-2" style={{backgroundColor:'#64B5F6'}}>
+                <Text className="font-bold text-lg text-black">{title}</Text>
+              </View>
+            )}
+          />
+        </>
+      )}
     </View>
   );
 }

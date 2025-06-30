@@ -1,15 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import { Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Image, TouchableOpacity, ActivityIndicator,Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db } from "../firebase_config";
 import { getDoc, updateDoc, doc, getDocs, collection } from "firebase/firestore";
 import { View, Text, TextInput, Button, FlatList, Modal,} from 'react-native';
 import styles from './menu_style.js';
+import ProtectedRoute from '../../components/ProtectedRoute';
+import { AuthContext } from '../../contexts/AuthContext';
+import { Alert } from 'react-native';
+import { useRouter } from 'expo-router';
+
 
 export default function Menu() {
   const { vendor_card_login } = useLocalSearchParams();
+  const { logout } = useContext(AuthContext);
+  const router = useRouter();
 
   const [menu, setMenu] = useState([]);
   const [vendorDetails, setVendorDetails] = useState({
@@ -183,8 +190,44 @@ export default function Menu() {
   if (loading) {
     return <ActivityIndicator size="large" style={{ marginTop: 40 }} />;
   }
+  const handleLogout = async() => {
+    console.log("Logout clicked");
+    alert("Logging out...")
+    try {
+      await logout();  
+      console.log("Logout successful");
+      router.replace('/');
+    } catch (error) {
+      console.error("Logout failed:", error);
+      alert("Logout failed.");
+    }
+  };
+  
+  
+  
 
   return (
+    <ProtectedRoute>
+    <View style={styles.container_header}>
+    
+    <View style={{
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      backgroundColor: '#2196F3'
+    }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Vendor Dashboard</Text>
+      <TouchableOpacity onPress={handleLogout} style={{ padding: 6 }}>
+      <Text style={{ color: 'red', fontSize: 16 }}>Log out</Text>
+     </TouchableOpacity>
+
+      </View>
+    </View>
+
+    
+
     <View style={styles.container}>
       <View style={[styles.vendorContainer, styles.shadow]}>
         {vendorDetails.imageurl ? (
@@ -195,7 +238,7 @@ export default function Menu() {
         <View style={styles.vendorInfo}>
           <Text style={styles.vendorName}>{vendorDetails.name}</Text>
           <Text style={styles.vendorDescription}>{vendorDetails.description}</Text>
-          <Text style={styles.vendorDetail}>📍 {vendorDetails.address}</Text>
+          <Text style={styles.vendorDetail}>🏠 {vendorDetails.address}</Text>
           <Text style={styles.vendorDetail}>📞 {vendorDetails.contact}</Text>
           <TouchableOpacity style={styles.addButton} onPress={() => setProfileModalVisible(true)}>
             <Text style={styles.addButtonText}>Edit Profile</Text>
@@ -203,7 +246,7 @@ export default function Menu() {
         </View>
       </View>
 
-      {/* Profile Modal */}
+      
       <Modal visible={profileModalVisible} animationType="slide" transparent>
         <View style={styles.overlay}>
           <View style={styles.modalContainer}>
@@ -213,7 +256,7 @@ export default function Menu() {
             <TextInput style={styles.input} placeholder="Address" value={vendorDetails.address} onChangeText={text => setVendorDetails({ ...vendorDetails, address: text })} />
             <TextInput style={styles.input} placeholder="Description" value={vendorDetails.description} onChangeText={text => setVendorDetails({ ...vendorDetails, description: text })} />
 
-            {/* Image Preview */}
+           
             {vendorDetails.imageurl ? (
               <Image source={{ uri: vendorDetails.imageurl }} style={{ width: 100, height: 100, alignSelf: 'center', marginBottom: 10, borderRadius: 8 }} />
             ) : (
@@ -234,7 +277,6 @@ export default function Menu() {
         </View>
       </Modal>
 
-      {/* Menu Modal */}
       <Modal visible={menuModalVisible} animationType="slide" transparent>
         <View style={styles.overlay}>
           <View style={styles.modalContainer}>
@@ -276,5 +318,6 @@ export default function Menu() {
         <Text style={styles.addButtonText}>+ Add Item</Text>
       </TouchableOpacity>
     </View>
+    </ProtectedRoute>
   );
 }
