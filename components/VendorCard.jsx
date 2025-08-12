@@ -15,13 +15,12 @@ function VendorCard({ vendor }) {
       }}
     >
       <View className="flex-row">
-        {/* Image on Left */}
         <Image
           source={{ uri: vendor.imageurl || vendor.img }}
           className="w-20 h-20 rounded-lg"
         />
 
-        {/* Text Info on Right */}
+        
         <View className="flex-1 ml-4 justify-center">
           <Text className="text-lg font-bold text-gray-800">
             {vendor.name}

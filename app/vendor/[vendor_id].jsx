@@ -192,6 +192,7 @@ export default function VendorDescription() {
 
               <ActionsheetItem
               onPress={async () => {
+                alert('After Placing Order, Please Call Vendor to Confirm Your Order')
               try {
                 const rawPhone = vendor.contact.replace(/[^\d]/g, ''); // keep digits only
                 const phoneNumber = `91${rawPhone.slice(-10)}`; // ensure last 10 digits
@@ -212,7 +213,7 @@ export default function VendorDescription() {
                   throw new Error('WhatsApp not supported');
                 }
               } catch (error) {
-                Alert.alert('WhatsApp not available', 'Try calling or sending an SMS.', [
+                alert('WhatsApp not available', 'Try calling or sending an SMS.', [
                   { text: 'Call Vendor', onPress: () => Linking.openURL(`tel:${vendor.contact}`) },
                   { text: 'Send SMS', onPress: () => Linking.openURL(`sms:${vendor.contact}`) },
                   { text: 'Cancel', style: 'cancel' },

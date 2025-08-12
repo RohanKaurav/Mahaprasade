@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mahaprasade-app",
+    "name": "Mahaprasade-Govinde",
     "slug": "mahaprasade-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -33,7 +33,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/krsna-the-cowheard-boys-taking-prasadam3.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -42,7 +42,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/icon.png",
+          "icon": "./assets/images/logo.png",
           "color": "#ffffff",
           "sounds": ["default"]
         }

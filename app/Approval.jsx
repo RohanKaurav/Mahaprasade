@@ -16,13 +16,20 @@ function AdminVendorApproval() {
       const snapshot = await getDocs(collection(db, 'vendors'));
       const allVendors = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       const stationMap = await fetchStations();
-
+      const cityMap=await fetchCities();
    
-    const vendorsWithStationNames = allVendors.map((vendor) => ({
-      ...vendor,
-      stationName: stationMap[vendor.station] || 'Unknown Station',
-    }));
-
+      const vendorsWithStationNames = allVendors.map((vendor) => {
+        const stationName = stationMap[vendor.station] || (vendor.station ? 'Unknown Station' : null);
+        const cityName = cityMap[vendor.city] || (vendor.city ? 'Unknown City' : null);
+      
+        return {
+          ...vendor,
+          stationName,
+          cityName,
+        };
+      });
+      
+  
       setPendingVendors(vendorsWithStationNames.filter((v) => !v.isApproved));
       setApprovedVendors(vendorsWithStationNames.filter((v) => v.isApproved));
     };
@@ -39,6 +46,17 @@ const fetchStations = async () => {
     stationMap[doc.id] = displayName;
   });
   return stationMap;
+};
+const fetchCities = async () => {
+  const citySnapshot = await getDocs(collection(db, 'cities'));
+  const cityMap = {};
+ citySnapshot.docs.forEach((doc) => {
+    const data = doc.data();
+    const name = data.name;
+    const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+    cityMap[doc.id] = displayName;
+  });
+  return cityMap;
 };
 
   const toggleApproval = async (vendorId, currentStatus) => {
@@ -115,6 +133,7 @@ const fetchStations = async () => {
               <Text className="text-xl font-bold mb-2">{selectedVendor.name}</Text>
               <Text className="text-sm mb-1">📞 {selectedVendor.contact}</Text>
               <Text className="text-sm mb-1">🚉 {selectedVendor.stationName}</Text>
+              <Text className="text-sm mb-1">🏙️ {selectedVendor.cityName}</Text>
               <Text className="text-sm mb-1">🏠 {selectedVendor.address}</Text>
               <Text className="text-sm mb-2">📝 {selectedVendor.description}</Text>
 

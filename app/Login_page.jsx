@@ -15,6 +15,7 @@ import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input";
 import { EyeOffIcon, EyeIcon } from "@/components/ui/icon";
 import { AuthContext } from '../contexts/AuthContext';
 import { ArrowLeftIcon,Icon } from '@/components/ui/icon';
+import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 
 
 export default function LoginPage() {
@@ -31,6 +32,10 @@ export default function LoginPage() {
   const [selectedStation, setSelectedStation] = useState("");
   const [newStationName, setNewStationName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cities, setCities] = useState([]);
+  const [selectedCity, setSelectedCity] = useState("");
+  const [newCityName, setNewCityName] = useState("");
+
   const { login } = useContext(AuthContext);
 
 
@@ -41,6 +46,9 @@ export default function LoginPage() {
 
       const stationSnapshot = await getDocs(collection(db, "stations"));
       setStations(stationSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+
+      const citySnapshot = await getDocs(collection(db, "cities"));
+    setCities(citySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     };
     fetchInitialData();
   }, []);
@@ -89,7 +97,10 @@ export default function LoginPage() {
   const handleSubmit = async () => {
     const normalizedMob = normalizeNumber(mobNum);
     if (!normalizedMob || !passWord.trim()) return alert("Mobile number and password are required");
-    if (!isValidPhone(mobNum)) return alert("Enter a valid Indian mobile number");
+    if (!isValidPhone(mobNum)){
+      setMobNum("");
+       return alert("Enter a valid Indian mobile number");
+      }
     if (typeOfUser === "Make New Account" && passWord !== confirmPassword) return alert("Passwords do not match");
 
     setIsSubmitting(true);
@@ -111,6 +122,8 @@ export default function LoginPage() {
         if (!querySnapshot.empty) return alert("This mobile number is already registered.");
 
         let stationId = selectedStation;
+        let cityId = selectedCity;
+
         if (stationId === "other" && newStationName.trim()) {
           const newStationRef = await addDoc(collection(db, "stations"), {
             name: newStationName,
@@ -119,6 +132,36 @@ export default function LoginPage() {
           stationId = newStationRef.id;
           setStations([...stations, { id: stationId, name: newStationName }]);
         }
+
+        if (cityId === "other" && newCityName.trim()) {
+          const newCityRef = await addDoc(collection(db, "cities"), {
+            name: newCityName,
+            vendors_list: [],
+          });
+          cityId = newCityRef.id;
+          setCities([...cities, { id: cityId, name: newCityName }]);
+        }
+
+        if (
+          (selectedStation === "" || selectedStation === "other" && !newStationName.trim()) &&
+          (selectedCity === "" || selectedCity === "other" && !newCityName.trim())
+        ) {
+          alert("Please select at least one: Station or City");
+          return;
+        }
+        if (
+          (selectedStation === "" && selectedStation === "other" && !newStationName.trim())
+        ) {
+          setSelectedStation("")
+          alert("Please Enter New Station or Select form List ");
+          return;
+        }else if((selectedCity === "" && selectedCity === "other" && !newCityName.trim())){
+          setSelectedCity("")
+          alert("Please Enter New City or Select from List");
+          return;
+        }
+        
+
 
         const { downloadURL, filePath } = await uploadImageToFirebase(imageUri);
 
@@ -130,10 +173,19 @@ export default function LoginPage() {
           imageurl: downloadURL,
           imagePath: filePath,
           station: stationId,
+          city: cityId || "",
         });
 
-        const stationRef = doc(db, "stations", stationId);
-        await updateDoc(stationRef, { vendors_list: arrayUnion(newVendorRef.id) });
+        if (stationId) {
+          const stationRef = doc(db, "stations", stationId);
+          await updateDoc(stationRef, { vendors_list: arrayUnion(newVendorRef.id) });
+        }
+        
+        if (cityId) {
+          const cityRef = doc(db, "cities", cityId);
+          await updateDoc(cityRef, { vendors_list: arrayUnion(newVendorRef.id) });
+        }
+        
 
         await login({ id: newVendorRef.id, contact: normalizedMob }); 
 
@@ -170,7 +222,8 @@ export default function LoginPage() {
   };
 
   return (
-    <> <View style={{
+    <> 
+    <View style={{
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: '#2196F3',
@@ -202,9 +255,34 @@ export default function LoginPage() {
         {`Welcome To Krishna's Family`}
       </Text>
     </View>
-    <View className="flex-1 justify-center items-center bg-gray-100">
-      <View className="w-full max-w-sm p-4">
-        <FormControl className="bg-white rounded-lg p-4 shadow-lg">
+    <View style={{ flex: 1, backgroundColor: '#FFF7C0' }}>
+  <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={{ flex: 1 }}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0} 
+  >
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={{
+        flexGrow: 1,
+        justifyContent: 'center',     
+        alignItems: 'center',          
+        paddingVertical: 24,
+        paddingHorizontal: 16,
+      }}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={true} 
+    >
+      <View
+        style={{
+          width: '100%',
+          maxWidth: 400,              
+          padding: 16,
+        }}
+      >
+      {/* <View className="w-full max-w-sm p-16"> */}
+        <FormControl className="bg-white rounded-lg  shadow-lg" style={{paddingVertical: 24,
+        paddingHorizontal:30,}}>
           <VStack space="xs">
             <Heading className="text-center text-xl font-bold mb-4 text-typography-900">
               {typeOfUser}
@@ -245,26 +323,51 @@ export default function LoginPage() {
                 </VStack>
 
                 <VStack space="xs">
-                  <Text className="text-sm text-gray-600 mb-1">Select Station</Text>
-                  <View className="border border-gray-300 rounded-md bg-white px-3 py-2">
-                    <Picker selectedValue={selectedStation} onValueChange={setSelectedStation}>
-                      <Picker.Item label="Select Station" value="" />
-                      {stations.map((station) => (
-                        <Picker.Item key={station.id} label={station.name} value={station.id} />
-                      ))}
-                      <Picker.Item label="Other (Add New Station)" value="other" />
-                    </Picker>
-                  </View>
-                </VStack>
+            <Text className="text-sm text-gray-600 mb-1">Select Station</Text>
+            <View className="border border-gray-300 rounded-md bg-white px-3 py-2">
+              <Picker selectedValue={selectedStation} onValueChange={setSelectedStation}>
+                <Picker.Item label="Select Station" value="" />
+                {stations.map((station) => (
+                  <Picker.Item key={station.id} label={station.name} value={station.id} />
+                ))}
+                <Picker.Item label="Other (Add New Station)" value="other" />
+              </Picker>
+            </View>
 
-                {selectedStation === "other" && (
-                  <VStack space="xs">
-                    <Text className="text-sm text-gray-600 mb-1">Enter New Station Name</Text>
-                    <Input>
-                      <InputField type="text" value={newStationName} onChangeText={setNewStationName} />
-                    </Input>
-                  </VStack>
-                )}
+            <Text className="text-sm text-gray-600 mb-1">Select City</Text>
+            <View className="border border-gray-300 rounded-md bg-white px-3 py-2">
+              <Picker selectedValue={selectedCity} onValueChange={setSelectedCity}>
+                <Picker.Item label="Select City" value="" />
+                {cities.map((city) => (
+                  <Picker.Item key={city.id} label={city.name} value={city.id} />
+                ))}
+                <Picker.Item label="Other (Add New City)" value="other" />
+              </Picker>
+            </View>
+              </VStack>
+
+              {(selectedStation === "other" || selectedCity === "other") && (
+                <VStack space="xs">
+                  {selectedStation === "other" && (
+                    <>
+                      <Text className="text-sm text-gray-600 mb-1">Enter New Station Name</Text>
+                      <Input>
+                        <InputField type="text" value={newStationName} onChangeText={setNewStationName} />
+                      </Input>
+                    </>
+                  )}
+
+                  {selectedCity === "other" && (
+                    <>
+                      <Text className="text-sm text-gray-600 mb-1">Enter New City Name</Text>
+                      <Input>
+                        <InputField type="text" value={newCityName} onChangeText={setNewCityName} />
+                      </Input>
+                    </>
+                  )}
+                </VStack>
+              )}
+
 
                 <VStack space="xs">
                   <Text className="text-sm text-gray-600 mb-1">Upload Image</Text>
@@ -292,6 +395,8 @@ export default function LoginPage() {
           <Text className="text-center text-blue-500 font-medium">{toggleToSignUpText}</Text>
         </TouchableOpacity>
       </View>
+      </ScrollView>
+  </KeyboardAvoidingView>
     </View>
     </>
   );

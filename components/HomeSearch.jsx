@@ -1,4 +1,4 @@
-import { Platform, View, Text, Keyboard, FlatList, SectionList, Pressable } from 'react-native';
+import { Platform, View, Text, Keyboard, FlatList, SectionList, Pressable ,Image } from 'react-native';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
@@ -6,7 +6,7 @@ import { SearchIcon, CloseIcon, MenuIcon } from '@/components/ui/icon';
 import { db } from "../app/firebase_config";
 import { getDocs, collection } from "firebase/firestore";
 import { Menu, MenuItem, MenuItemLabel, MenuSeparator } from '@/components/ui/menu';
-
+import SidebarMenu from './Sidebar'
 function HomeSearch() {
   const [query, setQuery] = useState('');
   const [filterData, setFilterData] = useState([]);
@@ -62,7 +62,8 @@ function HomeSearch() {
     <View style={{ flex: 1, backgroundColor: '#FFF7C0' }} pointerEvents="box-none">
       
       <View className="flex flex-row items-center w-full px-4 py-2" style={{ backgroundColor: '#2196F3' }}>
-        <View style={{ marginRight: 8 }}>
+        {/* <View style={{ marginRight: 8 }}>
+       
           <Menu
             offset={0}
             className="bg-white border border-blue-600 rounded-md shadow-lg"
@@ -72,6 +73,13 @@ function HomeSearch() {
               </Pressable>
             )}
           >
+            <MenuItem disabled>
+            <Image
+              source={require('../assets/images/krsna-the-cowheard-boys-taking-prasadam3.png')}
+              style={{ width: '100%' , height: 100,borderWidth:2, alignSelf: 'center' }}
+            />
+          </MenuItem>
+  <MenuSeparator />
             <MenuItem onPress={() => router.push('/Login_page')}>
               <MenuItemLabel size="sm">Vendor</MenuItemLabel>
             </MenuItem>
@@ -81,8 +89,8 @@ function HomeSearch() {
             </MenuItem>
             <MenuSeparator />
           </Menu>
-        </View>
-
+        </View> */}
+        <SidebarMenu></SidebarMenu>
        
         <View style={{ flex: 1 }} className="relative">
           <Input>
@@ -90,8 +98,8 @@ function HomeSearch() {
               onChangeText={handleInputChange}
               value={query}
               onFocus={() => setShowDropdown(true)}
-              placeholder="Search station to order Prasadam"
-              className="pl-10 pr-12"
+              placeholder="Search Station to Order Prasadam"
+              className="pl-10 pr-6"
               style={{
                 backgroundColor: '#FFF7C0',
                 borderRadius: 5,
@@ -166,7 +174,7 @@ function HomeSearch() {
             sections={groupedStations}
             keyExtractor={(item) => item.id}
             stickySectionHeadersEnabled={true}
-            contentContainerStyle={{ paddingBottom: 80 }}
+            contentContainerStyle={{ paddingBottom: 100 }}
             renderItem={({ item }) => (
               <Pressable
                 onPress={() => router.push(`/station/${item.id}`)}
@@ -183,6 +191,27 @@ function HomeSearch() {
           />
         </>
       )}
+          <View>
+            <Pressable 
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: '#2196F3',
+              paddingVertical: 12,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderTopWidth: 1,
+              borderColor: '#ccc',
+              zIndex: 1000,
+            }}
+            onPress={() => router.push('/cities')}>
+              <Text style={{ color: 'black', fontWeight: 'bold' }}>Search Prasadam in Cities</Text>
+            </Pressable>
+          </View>
+
+       
     </View>
   );
 }
