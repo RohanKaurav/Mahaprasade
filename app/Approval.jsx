@@ -95,7 +95,7 @@ const fetchCities = async () => {
 
   return (
     <View className="p-4 bg-gray-100 h-full">
-      <ScrollView>
+      <ScrollView className="font-bold mt-10">
        
         <Text className="text-xl font-bold mb-2">🕒 Pending Vendors</Text>
         {pendingVendors.length > 0 ? (
@@ -109,7 +109,7 @@ const fetchCities = async () => {
           <Text className="text-sm mb-4 text-gray-500">No pending vendors.</Text>
         )}
 
-        {/* Approved Section */}
+      
         <Text className="text-xl font-bold mt-6 mb-2">✅ Approved Vendors</Text>
         {approvedVendors.length > 0 ? (
           <FlatList

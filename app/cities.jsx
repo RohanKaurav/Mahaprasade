@@ -75,19 +75,19 @@ function CitySearch() {
             } else {
               router.navigate('/');
             }
-          }}>
+          }} className="mt-10">
         <Icon as={ArrowLeftIcon} className="font-bold"/>
         </Pressable>
           
         </View>
-        <View style={{ flex: 1}}>
+        <View style={{ flex: 1}} className="mt-10">
           <Input>
             <InputField
               onChangeText={handleInputChange}
               value={query}
               onFocus={() => setShowDropdown(true)}
               placeholder="Search City to Order Prasadam"
-              className="pl-10 pr-6"
+              className="pl-10 pr-6 pt-0 pb-0"
               style={{
                 backgroundColor: '#FFF7C0',
                 borderRadius: 5,

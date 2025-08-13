@@ -13,7 +13,7 @@ const sidebarWidth = screenWidth > 768
   ? screenWidth * 0.2 
   : screenWidth * 0.6; 
   return (
-    <View style={{ marginRight: 8 }}>
+    <View style={{ marginRight: 8 }} className="mt-10">
       <Pressable onPress={() => setSidebarVisible(true)} className="p-0">
       <Text style={{ fontSize: 24 }}>☰</Text>
 </Pressable>
@@ -60,15 +60,15 @@ const sidebarWidth = screenWidth > 768
     }}
     style={({ hovered }) => [
       {
-        paddingVertical: 14,
-        paddingHorizontal: 20,
+        paddingVertical: 24,
+        paddingHorizontal: 30,
         borderBottomWidth: 1,
         borderBottomColor: '#E5C77F',
         backgroundColor: hovered ? '#FFEFC1' : 'transparent',
       },
     ]}
   >
-    <Text style={{ fontSize: 18, color: '#1E3A8A' }}>Vendor</Text>
+    <Text style={{ fontSize: 18, color: '#1E3A8A' }} className="ml-4 mt-4">Vendor</Text>
   </Pressable>
 
   <Pressable
@@ -79,14 +79,15 @@ const sidebarWidth = screenWidth > 768
     style={({ hovered }) => [
       {
         paddingVertical: 14,
-        paddingHorizontal: 20,
+        paddingHorizontal: 30,
         borderBottomWidth: 1,
         borderBottomColor: '#E5C77F',
         backgroundColor: hovered ? '#FFEFC1' : 'transparent',
       },
     ]}
   >
-    <Text style={{ fontSize: 18, color: '#1E3A8A' }}>Admin</Text>
+    
+    <Text style={{ fontSize: 18, color: '#1E3A8A' }} className="ml-4 mt-4">Admin</Text>
   </Pressable>
           </View>
           <View style={{ flex: 1 }} />

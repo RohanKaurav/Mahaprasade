@@ -242,7 +242,7 @@ export default function LoginPage() {
           router.navigate('/');
         }
       }}>
-    <Icon as={ArrowLeftIcon} className="font-bold"/>
+    <Icon as={ArrowLeftIcon} className="font-bold mt-10"/>
     </Pressable>
       <Text style={{
         flex: 1,
@@ -251,7 +251,7 @@ export default function LoginPage() {
         fontWeight: 'bold',
         color: 'black',
         marginRight: 32, 
-      }}>
+      }} className="font-bold mt-10">
         {`Welcome To Krishna's Family`}
       </Text>
     </View>

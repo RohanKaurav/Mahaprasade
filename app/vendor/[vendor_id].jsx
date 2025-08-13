@@ -1,4 +1,4 @@
-import { Image, Pressable, View, Text, TouchableOpacity, ScrollView, Linking, Alert } from 'react-native';
+import { Image, Pressable, View, Text, TouchableOpacity, ScrollView, Linking, Alert,Platform } from 'react-native';
 import { useLocalSearchParams,Stack ,router} from 'expo-router';
 import { useState, useEffect } from 'react';
 import styles from "./vendorstyle.js";
@@ -74,6 +74,51 @@ export default function VendorDescription() {
     setMycost((t) => t - itemPrice);
   }
 
+  const handleOrder = () => {
+    const rawPhone = vendor.contact.replace(/[^\d]/g, '');
+    const phoneNumber = `91${rawPhone.slice(-10)}`;
+    const orderDetails = Object.entries(count)
+      .map(([item, qty]) => `${item}: ${qty}`)
+      .join('\n');
+    const plainMessage = `Hare Krishna 🙏\nI would like to place an order:\n${orderDetails}\nTotal Cost: ₹${totalCost}`;
+    const encodedMessage = encodeURIComponent(plainMessage);
+  
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    const smsUrl = `sms:${phoneNumber}?body=${encodedMessage}`; // fallback SMS
+  const callUrl = `tel:${phoneNumber}`; // direct call
+
+ 
+
+    // Show initial alert first
+    Alert.alert(
+      'After Placing Order',
+      'Please Call Vendor to Confirm Your Order',
+      [
+        {
+          text: 'Proceed with WhatsApp',
+          onPress: async () => {
+            try {
+                await Linking.openURL(whatsappUrl);
+            } catch (err) {
+              Alert.alert(
+                'WhatsApp not available',
+                'Try calling or sending an SMS.',
+                [
+                  { text: 'Call Vendor', onPress: () => Linking.openURL(`tel:${vendor.contact}`) },
+                  { text: 'Send SMS', onPress: () => Linking.openURL(`sms:${vendor.contact}`) },
+                  { text: 'Cancel', style: 'cancel' },
+                ]
+              );
+            }
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+  
+
+
   return (
     <>
     <View style={{
@@ -95,7 +140,7 @@ export default function VendorDescription() {
             router.navigate('/');
           }
         }}>
-      <Icon as={ArrowLeftIcon} className="font-bold"/>
+      <Icon as={ArrowLeftIcon} className="font-bold mt-10"/>
       </Pressable>
         <Text style={{
           flex: 1,
@@ -104,7 +149,8 @@ export default function VendorDescription() {
           fontWeight: 'bold',
           color: 'black',
           marginRight: 32, 
-        }}>
+    
+        }} className=" mt-10">
           {vendor?.name || 'Vendor'}
         </Text>
       </View>
@@ -190,39 +236,10 @@ export default function VendorDescription() {
                 <ActionsheetItemText>Total Cost: ₹{totalCost}</ActionsheetItemText>
               </ActionsheetItem>
 
-              <ActionsheetItem
-              onPress={async () => {
-                alert('After Placing Order, Please Call Vendor to Confirm Your Order')
-              try {
-                const rawPhone = vendor.contact.replace(/[^\d]/g, ''); // keep digits only
-                const phoneNumber = `91${rawPhone.slice(-10)}`; // ensure last 10 digits
-                const orderDetails = Object.entries(count)
-                  .map(([itemName, quantity]) => `${itemName}: ${quantity}`)
-                  .join('\n');
+              <ActionsheetItem onPress={handleOrder}>
+                <ActionsheetItemText>Order Now</ActionsheetItemText>
+              </ActionsheetItem>
 
-                const plainMessage = `Hare Krishna 🙏\nI would like to place an order:\n${orderDetails}\nTotal Cost: ₹${totalCost}`;
-                const encodedMessage = encodeURIComponent(plainMessage);
-                const whatsappUrl = `whatsapp://send?phone=${phoneNumber}&text=${encodedMessage}`;
-                const smsUrl = `sms:${phoneNumber}?body=${encodedMessage}`;
-                const telUrl = `tel:${phoneNumber}`;
-
-                const supported = await Linking.canOpenURL(whatsappUrl);
-                if (supported) {
-                  await Linking.openURL(whatsappUrl);
-                } else {
-                  throw new Error('WhatsApp not supported');
-                }
-              } catch (error) {
-                alert('WhatsApp not available', 'Try calling or sending an SMS.', [
-                  { text: 'Call Vendor', onPress: () => Linking.openURL(`tel:${vendor.contact}`) },
-                  { text: 'Send SMS', onPress: () => Linking.openURL(`sms:${vendor.contact}`) },
-                  { text: 'Cancel', style: 'cancel' },
-                ]);
-              }
-            }}
-          >
-            <ActionsheetItemText>Order Now</ActionsheetItemText>
-          </ActionsheetItem>
 
 
 

@@ -61,53 +61,28 @@ function HomeSearch() {
   return (
     <View style={{ flex: 1, backgroundColor: '#FFF7C0' }} pointerEvents="box-none">
       
-      <View className="flex flex-row items-center w-full px-4 py-2" style={{ backgroundColor: '#2196F3' }}>
-        {/* <View style={{ marginRight: 8 }}>
+      <View className="flex flex-row items-center w-full px-4 py-2 " style={{ backgroundColor: '#2196F3' }}>
+        <SidebarMenu >
+          
+        </SidebarMenu>
        
-          <Menu
-            offset={0}
-            className="bg-white border border-blue-600 rounded-md shadow-lg"
-            trigger={({ ...triggerProps }) => (
-              <Pressable {...triggerProps} className="bg-transparent p-0">
-                <MenuIcon className="text-black w-8 h-6" />
-              </Pressable>
-            )}
-          >
-            <MenuItem disabled>
-            <Image
-              source={require('../assets/images/krsna-the-cowheard-boys-taking-prasadam3.png')}
-              style={{ width: '100%' , height: 100,borderWidth:2, alignSelf: 'center' }}
-            />
-          </MenuItem>
-  <MenuSeparator />
-            <MenuItem onPress={() => router.push('/Login_page')}>
-              <MenuItemLabel size="sm">Vendor</MenuItemLabel>
-            </MenuItem>
-            <MenuSeparator />
-            <MenuItem onPress={() => router.push('/Admin')}>
-              <MenuItemLabel size="sm">Login as Admin</MenuItemLabel>
-            </MenuItem>
-            <MenuSeparator />
-          </Menu>
-        </View> */}
-        <SidebarMenu></SidebarMenu>
-       
-        <View style={{ flex: 1 }} className="relative">
+        <View style={{ flex: 1 }} className="relative mt-10">
           <Input>
             <InputField
               onChangeText={handleInputChange}
               value={query}
               onFocus={() => setShowDropdown(true)}
               placeholder="Search Station to Order Prasadam"
-              className="pl-10 pr-6"
+              className="pl-10 pr-6 pt-0 pb-0"
               style={{
                 backgroundColor: '#FFF7C0',
                 borderRadius: 5,
                 borderWidth: 1,
                 borderColor: 'gray',
+               
               }}
             />
-            <InputSlot className="absolute left-3">
+            <InputSlot className="absolute left-1" >
               {query.trim().length === 0 ? (
                 <Pressable>
                   <InputIcon as={SearchIcon} />
@@ -191,20 +166,21 @@ function HomeSearch() {
           />
         </>
       )}
-          <View>
-            <Pressable 
-            style={{
+          <View style={{
               position: 'absolute',
               bottom: 0,
               left: 0,
               right: 0,
+              zIndex: 1000,
+            }}>
+            <Pressable 
+            style={{
               backgroundColor: '#2196F3',
               paddingVertical: 12,
               justifyContent: 'center',
               alignItems: 'center',
               borderTopWidth: 1,
               borderColor: '#ccc',
-              zIndex: 1000,
             }}
             onPress={() => router.push('/cities')}>
               <Text style={{ color: 'black', fontWeight: 'bold' }}>Search Prasadam in Cities</Text>

@@ -216,10 +216,11 @@ export default function Menu() {
       alignItems: 'center',
       paddingHorizontal: 16,
       paddingVertical: 10,
-      backgroundColor: '#2196F3'
+      backgroundColor: '#2196F3',
+      
     }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Vendor Dashboard</Text>
-      <TouchableOpacity onPress={handleLogout} style={{ padding: 6 }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' ,marginTop:15}}>Vendor Dashboard</Text>
+      <TouchableOpacity onPress={handleLogout} style={{ padding: 6 ,marginTop:15}}>
       <Text style={{ color: 'red', fontSize: 16 }}>Log out</Text>
      </TouchableOpacity>
 
@@ -266,7 +267,7 @@ export default function Menu() {
             <TouchableOpacity style={styles.addButton} onPress={pickImage}>
               <Text style={styles.addButtonText}>Change Image</Text>
             </TouchableOpacity>
-              <br></br>
+            {'\n'}
             <View style={styles.buttonContainer}>
               <Button title="Save" onPress={handleUpdateProfile} />
               <TouchableOpacity style={[styles.addButton, { backgroundColor: 'grey' }]} onPress={() => setProfileModalVisible(false)}>
@@ -286,14 +287,14 @@ export default function Menu() {
             <TextInput style={styles.input} placeholder="Description" value={currentItem.description} onChangeText={text => setCurrentItem({ ...currentItem, description: text })} />
             <TouchableOpacity style={styles.addButton} onPress={handleSaveMenuItem}>
               <Text style={styles.addButtonText}>Save</Text>
-            </TouchableOpacity><br></br>
+            </TouchableOpacity>{'\n'}
             <TouchableOpacity style={[styles.addButton, { backgroundColor: 'grey' }]} onPress={() => setMenuModalVisible(false)}>
               <Text style={styles.addButtonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-<br></br>
+      {'\n'}
       <FlatList
         data={menu}
         keyExtractor={(item) => item.id}
