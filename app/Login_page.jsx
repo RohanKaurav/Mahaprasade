@@ -38,6 +38,7 @@ export default function LoginPage() {
 
   const { login } = useContext(AuthContext);
 
+  
 
   useEffect(() => {
     const fetchInitialData = async () => {

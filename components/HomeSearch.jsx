@@ -14,7 +14,7 @@ function HomeSearch() {
   const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
   const sectionListRef = useRef(null);
-
+  
   useEffect(() => {
     const fetchStations = async () => {
       const snapshot = await getDocs(collection(db, 'stations'));
