@@ -5,7 +5,8 @@ import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import { SearchIcon, CloseIcon } from '@/components/ui/icon';
 import { db } from './firebase_config';
 import { getDocs, collection } from 'firebase/firestore';
-import { ArrowLeftIcon,Icon } from '@/components/ui/icon';
+import AppHeader from '../components/AppHeader';
+import { AppTheme } from '../constants/AppTheme';
 
 function CitySearch() {
   const [query, setQuery] = useState('');
@@ -59,28 +60,10 @@ function CitySearch() {
   }, [totalData]);
 
   return (
-    <>
-    <View style={{ flex: 1, backgroundColor: '#FFF7C0' }}>
-      <View style={{ flexDirection: 'row', padding: 12, backgroundColor: '#2196F3',marginBottom:8 }}>
-      <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingVertical: 12,
-          paddingHorizontal: 16,
-          elevation: 4,
-        }}>
-          <Pressable onPress={() => {
-            if (router.canGoBack()) {
-              router.back();
-            } else {
-              router.navigate('/');
-            }
-          }} className="mt-10">
-        <Icon as={ArrowLeftIcon} className="font-bold"/>
-        </Pressable>
-          
-        </View>
-        <View style={{ flex: 1}} className="mt-10">
+    <View style={{ flex: 1, backgroundColor: AppTheme.colors.background }}>
+      <AppHeader title="Search Cities" />
+      <View style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4 }}>
+        <View style={{ flex: 1}}>
           <Input>
             <InputField
               onChangeText={handleInputChange}
@@ -89,10 +72,10 @@ function CitySearch() {
               placeholder="Search City to Order Prasadam"
               className="pl-10 pr-6 pt-0 pb-0"
               style={{
-                backgroundColor: '#FFF7C0',
-                borderRadius: 5,
+                backgroundColor: AppTheme.colors.surface,
+                borderRadius: 12,
                 borderWidth: 1,
-                borderColor: 'gray',
+                borderColor: AppTheme.colors.border,
               }}
             />
             <InputSlot className="absolute left-3">
@@ -110,10 +93,10 @@ function CitySearch() {
               top: '100%',
               marginTop: 8,
               width: '100%',
-              backgroundColor: 'white',
-              borderColor: '#ccc',
+              backgroundColor: AppTheme.colors.surface,
+              borderColor: AppTheme.colors.border,
               borderWidth: 1,
-              borderRadius: 8,
+              borderRadius: 12,
               elevation: 3,
               zIndex: 1001,
             }}>
@@ -129,13 +112,13 @@ function CitySearch() {
                       setShowDropdown(false);
                       Keyboard.dismiss();
                     }}
-                    style={{ padding: 12, borderBottomColor: '#ddd', borderBottomWidth: 1 }}
+                    style={{ padding: 12, borderBottomColor: AppTheme.colors.border, borderBottomWidth: 1 }}
                   >
-                    <Text>{item.name}</Text>
+                    <Text style={{ color: AppTheme.colors.textPrimary }}>{item.name}</Text>
                   </Pressable>
                 )}
                 ListEmptyComponent={
-                  <Text style={{ padding: 12, color: 'gray' }}>No matching city</Text>
+                  <Text style={{ padding: 12, color: AppTheme.colors.textSecondary }}>No matching city</Text>
                 }
               />
             </View>
@@ -153,20 +136,19 @@ function CitySearch() {
           renderItem={({ item }) => (
             <Pressable
               onPress={() => router.push(`/city/${item.id}`)}
-              style={{ padding: 12, borderBottomColor: '#ccc', borderBottomWidth: 1 }}
+              style={{ padding: 12, borderBottomColor: AppTheme.colors.border, borderBottomWidth: 1, backgroundColor: AppTheme.colors.surface }}
             >
-              <Text>{item.name}</Text>
+              <Text style={{ color: AppTheme.colors.textPrimary, fontWeight: "500" }}>{item.name}</Text>
             </Pressable>
           )}
           renderSectionHeader={({ section: { title } }) => (
-            <View style={{ backgroundColor: '#64B5F6', padding: 8 }}>
-              <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{title}</Text>
+            <View style={{ backgroundColor: AppTheme.colors.accentSoft, padding: 8 }}>
+              <Text style={{ fontWeight: '700', fontSize: 16, color: AppTheme.colors.accentPrimary }}>{title}</Text>
             </View>
           )}
         />
       )}
     </View>
-    </>
   );
 }
 

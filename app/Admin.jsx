@@ -1,17 +1,10 @@
 import { useState } from 'react';
-import { Pressable, Text, View, Modal, TextInput, Alert } from 'react-native';
+import { Text, View, Modal, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
-import {
-  Menu,
-  MenuItem,
-  MenuItemLabel,
-  MenuSeparator
-} from '@/components/ui/menu';
-import { MenuIcon } from '@/components/ui/icon';
 import { Button, ButtonText } from '@/components/ui/button';
-import { db } from './firebase_config'; // Firestore instance
+import { AppTheme } from '../constants/AppTheme';
 
 function CustomMenu() {
   const [isModalVisible, setModalVisible] = useState(true);
@@ -37,14 +30,14 @@ function CustomMenu() {
         console.log("kuch gadwad hai")
         alert('Access Denied', 'You are not an admin.');
       }
-    } catch (error) {
+    } catch (_error) {
       alert('Access Denied', 'You are not an admin.');
       
     }
   };
 
   return (
-    <View>
+    <View style={{ flex: 1, backgroundColor: AppTheme.colors.background }}>
   
 
       {/* Admin Login Modal */}
@@ -54,14 +47,15 @@ function CustomMenu() {
         animationType="slide"
       >
         <View className="flex-1 justify-center items-center bg-black/50">
-          <View className="bg-white p-6 rounded-lg w-[80%]">
-            <Text className="text-lg font-bold mb-4">Admin Login</Text>
+          <View className="p-6 rounded-lg w-[80%]" style={{ backgroundColor: AppTheme.colors.surface, borderWidth: 1, borderColor: AppTheme.colors.border }}>
+            <Text className="text-lg font-bold mb-4" style={{ color: AppTheme.colors.textPrimary }}>Admin Login</Text>
 
             <TextInput
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
-              className="border p-2 mb-2 rounded"
+              className="p-2 mb-2 rounded"
+              style={{ borderWidth: 1, borderColor: AppTheme.colors.border, color: AppTheme.colors.textPrimary }}
               keyboardType="email-address"
             />
 
@@ -69,15 +63,16 @@ function CustomMenu() {
               placeholder="Password"
               value={password}
               onChangeText={setPassword}
-              className="border p-2 mb-4 rounded"
+              className="p-2 mb-4 rounded"
+              style={{ borderWidth: 1, borderColor: AppTheme.colors.border, color: AppTheme.colors.textPrimary }}
               secureTextEntry
             />
 
-            <Button onPress={handleAdminLogin} className="bg-blue-500 p-2 rounded">
+            <Button onPress={handleAdminLogin} className="p-2 rounded" style={{ backgroundColor: AppTheme.colors.accentPrimary }}>
               <ButtonText className="text-white">Login</ButtonText>
             </Button>
 
-            <Button onPress={() =>router.back('/HomeSearch') } className="bg-gray-500 p-2 rounded mt-2">
+            <Button onPress={() =>router.back('/HomeSearch') } className="p-2 rounded mt-2" style={{ backgroundColor: "#6B7280" }}>
               <ButtonText className="text-white">Cancel</ButtonText>
             </Button>
           </View>

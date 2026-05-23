@@ -1,5 +1,7 @@
 import { View, Text, Image, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
+import { AppTheme } from '../constants/AppTheme';
+import AppCard from './AppCard';
 
 function VendorCard({ vendor }) {
   const router = useRouter();
@@ -7,39 +9,36 @@ function VendorCard({ vendor }) {
   return (
     <Pressable
       onPress={() => router.push(`/vendor/${vendor.id}`)}
-      className="bg-white rounded-xl shadow-md"
-      style={{
-        marginHorizontal: 12,
-        marginVertical: 8,
-        padding: 12,
-      }}
+      style={{ marginHorizontal: 12, marginVertical: 7 }}
     >
-      <View className="flex-row">
+      <AppCard>
+      <View style={{ flexDirection: "row" }}>
         <Image
           source={{ uri: vendor.imageurl || vendor.img }}
-          className="w-20 h-20 rounded-lg"
+          style={{ width: 82, height: 82, borderRadius: 12, backgroundColor: AppTheme.colors.surfaceAlt }}
         />
 
         
-        <View className="flex-1 ml-4 justify-center">
-          <Text className="text-lg font-bold text-gray-800">
+        <View style={{ flex: 1, marginLeft: 12, justifyContent: "center" }}>
+          <Text style={{ fontSize: 18, fontWeight: "700", color: AppTheme.colors.textPrimary }}>
             {vendor.name}
           </Text>
 
           {vendor.description ? (
-            <Text className="text-sm text-gray-600 italic mt-1">
+            <Text style={{ fontSize: 13, color: AppTheme.colors.textSecondary, marginTop: 4 }}>
               {vendor.description}
             </Text>
           ) : null}
 
-          <Text className="text-xs text-gray-500 mt-2">
+          <Text style={{ fontSize: 12, color: AppTheme.colors.textSecondary, marginTop: 8 }}>
             📞 {vendor.contact}
           </Text>
-          <Text className="text-xs text-gray-500">
+          <Text style={{ fontSize: 12, color: AppTheme.colors.textSecondary }}>
             📍 {vendor.address}
           </Text>
         </View>
       </View>
+      </AppCard>
     </Pressable>
   );
 }

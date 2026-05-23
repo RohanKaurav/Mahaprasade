@@ -1,4 +1,4 @@
-import { Image, View, Text, TouchableOpacity, ActivityIndicator,Pressable } from "react-native";
+import { Image, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { useState, useEffect,useContext } from "react";
 import { router } from "expo-router";
 import { db, storage } from "../app/firebase_config";
@@ -14,8 +14,8 @@ import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input";
 import { EyeOffIcon, EyeIcon } from "@/components/ui/icon";
 import { AuthContext } from '../contexts/AuthContext';
-import { ArrowLeftIcon,Icon } from '@/components/ui/icon';
-import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import AppHeader from '../components/AppHeader';
+import { AppTheme } from '../constants/AppTheme';
 
 
 export default function LoginPage() {
@@ -223,40 +223,9 @@ export default function LoginPage() {
   };
 
   return (
-    <> 
-    <View style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: '#2196F3',
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      elevation: 4,
-      shadowColor: '#000',
-      shadowOpacity: 0.1,
-      shadowOffset: { width: 0, height: 2 },
-      shadowRadius: 4
-    }}>
-      <Pressable onPress={() => {
-        if (router.canGoBack()) {
-          router.back();
-        } else {
-          router.navigate('/');
-        }
-      }}>
-    <Icon as={ArrowLeftIcon} className="font-bold mt-10"/>
-    </Pressable>
-      <Text style={{
-        flex: 1,
-        textAlign: 'center',
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: 'black',
-        marginRight: 32, 
-      }} className="font-bold mt-10">
-        {`Welcome To Krishna's Family`}
-      </Text>
-    </View>
-    <View style={{ flex: 1, backgroundColor: '#FFF7C0' }}>
+    <View style={{ flex: 1, backgroundColor: AppTheme.colors.background }}> 
+    <AppHeader title="Welcome To Krishna's Family" />
+    <View style={{ flex: 1, backgroundColor: AppTheme.colors.background }}>
   <KeyboardAvoidingView
     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     style={{ flex: 1 }}
@@ -283,7 +252,7 @@ export default function LoginPage() {
       >
       {/* <View className="w-full max-w-sm p-16"> */}
         <FormControl className="bg-white rounded-lg  shadow-lg" style={{paddingVertical: 24,
-        paddingHorizontal:30,}}>
+        paddingHorizontal:30, borderColor: AppTheme.colors.border, borderWidth: 1}}>
           <VStack space="xs">
             <Heading className="text-center text-xl font-bold mb-4 text-typography-900">
               {typeOfUser}
@@ -382,7 +351,7 @@ export default function LoginPage() {
               </>
             )}
 
-            <Button className="bg-blue-500 rounded-md py-2 mt-4" onPress={handleSubmit} disabled={isSubmitting}>
+            <Button className="rounded-md py-2 mt-4" style={{ backgroundColor: AppTheme.colors.accentPrimary }} onPress={handleSubmit} disabled={isSubmitting}>
               {isSubmitting ? (
                 <ActivityIndicator color="#fff" />
               ) : (
@@ -399,6 +368,6 @@ export default function LoginPage() {
       </ScrollView>
   </KeyboardAvoidingView>
     </View>
-    </>
+    </View>
   );
 }

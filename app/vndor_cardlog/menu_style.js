@@ -1,37 +1,40 @@
 import { StyleSheet } from 'react-native';
+import { AppTheme } from '../../constants/AppTheme';
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 ,backgroundColor:'#FFF7C0'},
+  container: { flex: 1, padding: 20 ,backgroundColor: AppTheme.colors.background},
   Container_header:{flex:1,padding:10},
   itemContainer: {
     marginBottom: 15,
     padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderRadius:10,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.md,
+    borderWidth: 1,
+    borderColor: AppTheme.colors.border,
   },
   itemName: { fontSize: 18, fontWeight: 'bold' },
   addButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: AppTheme.colors.accentPrimary,
     padding: 10,
-    borderRadius: 5,
+    borderRadius: AppTheme.radius.sm,
     alignItems: 'center',
   },
   addButtonText: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
   modalContainer: {
     width: '80%',
     padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 10,
+    backgroundColor: AppTheme.colors.surface,
+    borderRadius: AppTheme.radius.md,
     elevation: 5,
   },
   modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20 },
   input: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: AppTheme.colors.surfaceAlt,
     padding: 10,
-    borderRadius: 5,
+    borderRadius: AppTheme.radius.sm,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: AppTheme.colors.border,
   },
   buttonContainer: { flexDirection: 'row', justifyContent: 'space-between' },
   buttonRow: {
@@ -49,11 +52,11 @@ const styles = StyleSheet.create({
   vendorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: AppTheme.colors.surface,
     padding: 10,
     marginHorizontal: 10,
     marginTop: 10,
-    borderRadius: 10,
+    borderRadius: AppTheme.radius.md,
 },
 shadow: {
     shadowColor: '#000',
@@ -74,16 +77,16 @@ vendorInfo: {
 vendorName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: AppTheme.colors.textPrimary,
 },
 vendorDescription: {
     fontSize: 14,
-    color: '#555',
+    color: AppTheme.colors.textSecondary,
     marginVertical: 5,
 },
 vendorDetail: {
     fontSize: 12,
-    color: '#666',
+    color: AppTheme.colors.textSecondary,
 },
 
 

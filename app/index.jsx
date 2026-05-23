@@ -2,6 +2,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { useContext, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import { AppTheme } from '../constants/AppTheme';
 
 import HomeSearch from '../components/HomeSearch';
 
@@ -22,7 +23,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={AppTheme.colors.accentPrimary} />
         
       </View>
     );

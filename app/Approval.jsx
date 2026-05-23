@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { db } from '../app/firebase_config';
 import { getDocs, collection, updateDoc, doc } from 'firebase/firestore';
 import { Button, ButtonText } from '@/components/ui/button';
+import { AppTheme } from '../constants/AppTheme';
+import AppCard from '../components/AppCard';
 
 function AdminVendorApproval() {
   const [approvedVendors, setApprovedVendors] = useState([]);
@@ -86,18 +88,18 @@ const fetchCities = async () => {
 
   const renderVendorCard = (vendor) => (
     <TouchableOpacity onPress={() => openVendorModal(vendor)}>
-      <View className="border p-4 mb-3 rounded bg-white shadow">
-        <Text className="text-lg font-semibold">{vendor.name}</Text>
-        <Text className="text-sm text-gray-500">Tap to view details</Text>
-      </View>
+      <AppCard style={{ marginBottom: 10 }}>
+        <Text style={{ fontSize: 18, fontWeight: "700", color: AppTheme.colors.textPrimary }}>{vendor.name}</Text>
+        <Text style={{ fontSize: 13, color: AppTheme.colors.textSecondary }}>Tap to view details</Text>
+      </AppCard>
     </TouchableOpacity>
   );
 
   return (
-    <View className="p-4 bg-gray-100 h-full">
+    <View style={{ padding: 14, backgroundColor: AppTheme.colors.background, height: "100%" }}>
       <ScrollView className="font-bold mt-10">
        
-        <Text className="text-xl font-bold mb-2">🕒 Pending Vendors</Text>
+        <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 12, color: AppTheme.colors.textPrimary }}>Pending Vendors</Text>
         {pendingVendors.length > 0 ? (
           <FlatList
             data={pendingVendors}
@@ -106,11 +108,11 @@ const fetchCities = async () => {
             scrollEnabled={false}
           />
         ) : (
-          <Text className="text-sm mb-4 text-gray-500">No pending vendors.</Text>
+          <Text style={{ fontSize: 13, marginBottom: 16, color: AppTheme.colors.textSecondary }}>No pending vendors.</Text>
         )}
 
       
-        <Text className="text-xl font-bold mt-6 mb-2">✅ Approved Vendors</Text>
+        <Text style={{ fontSize: 22, fontWeight: "700", marginTop: 12, marginBottom: 12, color: AppTheme.colors.textPrimary }}>Approved Vendors</Text>
         {approvedVendors.length > 0 ? (
           <FlatList
             data={approvedVendors}
@@ -119,7 +121,7 @@ const fetchCities = async () => {
             scrollEnabled={false}
           />
         ) : (
-          <Text className="text-sm text-gray-500">No approved vendors.</Text>
+          <Text style={{ fontSize: 13, color: AppTheme.colors.textSecondary }}>No approved vendors.</Text>
         )}
       </ScrollView>
       <Modal
@@ -127,7 +129,7 @@ const fetchCities = async () => {
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-        <ScrollView className="p-4 bg-white">
+        <ScrollView style={{ padding: 14, backgroundColor: AppTheme.colors.surface }}>
           {selectedVendor && (
             <>
               <Text className="text-xl font-bold mb-2">{selectedVendor.name}</Text>
@@ -164,7 +166,8 @@ const fetchCities = async () => {
               <View className="flex flex-row justify-between mt-4">
                 <Button
                   onPress={() => toggleApproval(selectedVendor.id, selectedVendor.isApproved)}
-                  className={`w-[48%] ${selectedVendor.isApproved ? 'bg-yellow-500' : 'bg-green-500'}`}
+                  className="w-[48%]"
+                  style={{ backgroundColor: selectedVendor.isApproved ? AppTheme.colors.warning : AppTheme.colors.success }}
                 >
                   <ButtonText className="text-white">
                     {selectedVendor.isApproved ? 'Unapprove' : 'Approve'}

@@ -1,12 +1,11 @@
-import { View, Text, FlatList,Pressable} from 'react-native';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { View, Text, FlatList } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import VendorCard from '../../components/VendorCard';
-import { Icon } from '@/components/ui/icon';
-import { ArrowLeftIcon } from '@/components/ui/icon';
 import { db } from '../firebase_config';
 import { getDocs, collection } from "firebase/firestore";
 import {useEffect, useState} from 'react'
-import { Button, } from "@/components/ui/button"
+import AppHeader from '../../components/AppHeader';
+import { AppTheme } from '../../constants/AppTheme';
 
 function CityDetails() {
     const  {city_id} = useLocalSearchParams() 
@@ -50,15 +49,15 @@ function CityDetails() {
       const city = cityData.find((item) => item.id === city_id); 
       if (loadingCities || loadingVendors) {
         return (
-            <View>
-                <Text>Loading...</Text>
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: AppTheme.colors.background }}>
+                <Text style={{ color: AppTheme.colors.textSecondary }}>Loading...</Text>
             </View>
         );
     }    
         if (!city) {
             return (
-                <View >
-                    <Text>City not found</Text>
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: AppTheme.colors.background }}>
+                    <Text style={{ color: AppTheme.colors.textSecondary }}>City not found</Text>
                 </View>
             );
         }
@@ -69,48 +68,15 @@ function CityDetails() {
     );
 
     return (
-        <>
-        <View style={{
-                       flexDirection: 'row',
-                       alignItems: 'center',
-                       backgroundColor: '#2196F3',
-                       paddingVertical: 12,
-                       paddingHorizontal: 16,
-                       elevation: 4,
-                       shadowColor: '#000',
-                       shadowOpacity: 0.1,
-                       shadowOffset: { width: 0, height: 2 },
-                       shadowRadius: 4
-                     }}>
-                       <Pressable onPress={() => {
-                         if (router.canGoBack()) {
-                           router.back();
-                         } else {
-                           router.navigate('/');
-                         }
-                       }}>
-                     <Icon as={ArrowLeftIcon} className="font-bold mt-10"/>
-                     </Pressable>
-                       <Text style={{
-                         flex: 1,
-                         textAlign: 'center',
-                         fontSize: 18,
-                         fontWeight: 'bold',
-                         color: 'black',
-                         marginRight: 32, 
-                   
-                       }} className=" mt-10">
-                         {city.name }
-                       </Text>
-                     </View>
+        <View style={{ flex: 1, backgroundColor: AppTheme.colors.background }}>
+        <AppHeader title={city.name} />
         <FlatList  
                     data={vendors}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => <VendorCard vendor={item} />}
-                    style={{backgroundColor: '#FFF7C0',}}
+                    style={{backgroundColor: AppTheme.colors.background}}
                 />
-                
-        </>
+        </View>
         
     );
 }

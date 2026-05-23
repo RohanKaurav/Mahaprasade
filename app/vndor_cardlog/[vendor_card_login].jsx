@@ -1,16 +1,14 @@
 import React, { useState, useEffect,useContext } from 'react';
-import { useLocalSearchParams } from 'expo-router';
-import { Image, TouchableOpacity, ActivityIndicator,Platform } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Image, TouchableOpacity, ActivityIndicator, View, Text, TextInput, Button, FlatList, Modal } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db } from "../firebase_config";
 import { getDoc, updateDoc, doc, getDocs, collection } from "firebase/firestore";
-import { View, Text, TextInput, Button, FlatList, Modal,} from 'react-native';
 import styles from './menu_style.js';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import { AuthContext } from '../../contexts/AuthContext';
-import { Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { AppTheme } from '../../constants/AppTheme';
 
 
 export default function Menu() {
@@ -53,7 +51,7 @@ export default function Menu() {
     };
 
     fetchVendorData();
-  }, []);
+  }, [vendor_card_login]);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -216,12 +214,14 @@ export default function Menu() {
       alignItems: 'center',
       paddingHorizontal: 16,
       paddingVertical: 10,
-      backgroundColor: '#2196F3',
+      backgroundColor: AppTheme.colors.headerBg,
+      borderBottomWidth: 1,
+      borderColor: AppTheme.colors.border,
       
     }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold' ,marginTop:15}}>Vendor Dashboard</Text>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' ,marginTop:15, color: AppTheme.colors.textPrimary}}>Vendor Dashboard</Text>
       <TouchableOpacity onPress={handleLogout} style={{ padding: 6 ,marginTop:15}}>
-      <Text style={{ color: 'red', fontSize: 16 }}>Log out</Text>
+      <Text style={{ color: AppTheme.colors.danger, fontSize: 16 }}>Log out</Text>
      </TouchableOpacity>
 
       </View>

@@ -1,0 +1,45 @@
+export const AppTheme = {
+  colors: {
+    background: "#FFF9EF",
+    surface: "#FFFFFF",
+    surfaceAlt: "#FFF3DC",
+    textPrimary: "#1F2937",
+    textSecondary: "#6B7280",
+    accentPrimary: "#D97706",
+    accentSoft: "#FDE7C3",
+    border: "#F1D7AE",
+    success: "#15803D",
+    warning: "#C2410C",
+    danger: "#B91C1C",
+    headerBg: "#FFFBF5",
+  },
+  spacing: {
+    xs: 6,
+    sm: 10,
+    md: 14,
+    lg: 18,
+    xl: 24,
+    xxl: 32,
+  },
+  radius: {
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
+  },
+  typography: {
+    title: 22,
+    subtitle: 18,
+    body: 15,
+    caption: 13,
+  },
+  elevation: {
+    card: {
+      shadowColor: "#7C4A03",
+      shadowOpacity: 0.09,
+      shadowOffset: { width: 0, height: 3 },
+      shadowRadius: 8,
+      elevation: 3,
+    },
+  },
+};

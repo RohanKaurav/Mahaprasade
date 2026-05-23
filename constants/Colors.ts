@@ -24,3 +24,17 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+export const SemanticColors = {
+  background: '#FFF9EF',
+  surface: '#FFFFFF',
+  surfaceAlt: '#FFF3DC',
+  textPrimary: '#1F2937',
+  textSecondary: '#6B7280',
+  accentPrimary: '#D97706',
+  accentSoft: '#FDE7C3',
+  border: '#F1D7AE',
+  success: '#15803D',
+  warning: '#C2410C',
+  danger: '#B91C1C',
+};

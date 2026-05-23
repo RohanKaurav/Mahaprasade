@@ -1,12 +1,12 @@
-import { Platform, View, Text, Keyboard, FlatList, SectionList, Pressable ,Image } from 'react-native';
+import { View, Text, Keyboard, FlatList, SectionList, Pressable } from 'react-native';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
-import { SearchIcon, CloseIcon, MenuIcon } from '@/components/ui/icon';
+import { SearchIcon, CloseIcon } from '@/components/ui/icon';
 import { db } from "../app/firebase_config";
 import { getDocs, collection } from "firebase/firestore";
-import { Menu, MenuItem, MenuItemLabel, MenuSeparator } from '@/components/ui/menu';
 import SidebarMenu from './Sidebar'
+import { AppTheme } from '../constants/AppTheme';
 function HomeSearch() {
   const [query, setQuery] = useState('');
   const [filterData, setFilterData] = useState([]);
@@ -59,14 +59,14 @@ function HomeSearch() {
   }, [totalData]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFF7C0' }} pointerEvents="box-none">
+    <View style={{ flex: 1, backgroundColor: AppTheme.colors.background }} pointerEvents="box-none">
       
-      <View className="flex flex-row items-center w-full px-4 py-2 " style={{ backgroundColor: '#2196F3' }}>
+      <View style={{ flexDirection: "row", alignItems: "center", width: "100%", paddingHorizontal: 14, paddingBottom: 12, paddingTop: 40, backgroundColor: AppTheme.colors.headerBg, borderBottomWidth: 1, borderColor: AppTheme.colors.border }}>
         <SidebarMenu >
           
         </SidebarMenu>
        
-        <View style={{ flex: 1 }} className="relative mt-10">
+        <View style={{ flex: 1, position: "relative" }}>
           <Input>
             <InputField
               onChangeText={handleInputChange}
@@ -75,10 +75,10 @@ function HomeSearch() {
               placeholder="Search Station to Order Prasadam"
               className="pl-10 pr-6 pt-0 pb-0"
               style={{
-                backgroundColor: '#FFF7C0',
-                borderRadius: 5,
+                backgroundColor: AppTheme.colors.surface,
+                borderRadius: 12,
                 borderWidth: 1,
-                borderColor: 'gray',
+                borderColor: AppTheme.colors.border,
                
               }}
             />
@@ -103,10 +103,10 @@ function HomeSearch() {
                 top: '100%',
                 marginTop: 6,
                 width: '100%',
-                backgroundColor: 'white',
-                borderColor: '#ccc',
+                backgroundColor: AppTheme.colors.surface,
+                borderColor: AppTheme.colors.border,
                 borderWidth: 1,
-                borderRadius: 8,
+                borderRadius: 12,
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 1 },
                 shadowOpacity: 0.2,
@@ -121,7 +121,7 @@ function HomeSearch() {
                 keyboardShouldPersistTaps="always"
                 renderItem={({ item }) => (
                   <Pressable
-                    className="p-3 border-b border-gray-200"
+                    style={{ padding: 12, borderBottomColor: AppTheme.colors.border, borderBottomWidth: 1 }}
                     onPress={() => {
                       router.push(`/station/${item.id}`);
                       setQuery('');
@@ -129,11 +129,11 @@ function HomeSearch() {
                       Keyboard.dismiss();
                     }}
                   >
-                    <Text className="text-gray-800">{item.name}</Text>
+                    <Text style={{ color: AppTheme.colors.textPrimary }}>{item.name}</Text>
                   </Pressable>
                 )}
                 ListEmptyComponent={
-                  <Text className="p-4 text-gray-500">No matching station</Text>
+                  <Text style={{ padding: 12, color: AppTheme.colors.textSecondary }}>No matching station</Text>
                 }
               />
             </View>
@@ -153,14 +153,14 @@ function HomeSearch() {
             renderItem={({ item }) => (
               <Pressable
                 onPress={() => router.push(`/station/${item.id}`)}
-                className="px-4 py-3 border-b border-gray-300"
+                style={{ paddingHorizontal: 16, paddingVertical: 14, borderBottomColor: AppTheme.colors.border, borderBottomWidth: 1, backgroundColor: AppTheme.colors.surface }}
               >
-                <Text className="text-black text-base">{item.name.charAt(0).toUpperCase() + item.name.slice(1)}</Text>
+                <Text style={{ color: AppTheme.colors.textPrimary, fontSize: 16, fontWeight: "500" }}>{item.name.charAt(0).toUpperCase() + item.name.slice(1)}</Text>
               </Pressable>
             )}
             renderSectionHeader={({ section: { title } }) => (
-              <View className="bg-blue-200 px-4 py-2 mt-2" style={{backgroundColor:'#64B5F6'}}>
-                <Text className="font-bold text-lg text-black">{title}</Text>
+              <View style={{ backgroundColor: AppTheme.colors.accentSoft, paddingHorizontal: 16, paddingVertical: 8, marginTop: 10 }}>
+                <Text style={{ fontWeight: '700', fontSize: 17, color: AppTheme.colors.accentPrimary }}>{title}</Text>
               </View>
             )}
           />
@@ -175,15 +175,15 @@ function HomeSearch() {
             }}>
             <Pressable 
             style={{
-              backgroundColor: '#2196F3',
+              backgroundColor: AppTheme.colors.accentPrimary,
               paddingVertical: 12,
               justifyContent: 'center',
               alignItems: 'center',
               borderTopWidth: 1,
-              borderColor: '#ccc',
+              borderColor: AppTheme.colors.border,
             }}
             onPress={() => router.push('/cities')}>
-              <Text style={{ color: 'black', fontWeight: 'bold' }}>Search Prasadam in Cities</Text>
+              <Text style={{ color: '#fff', fontWeight: '700' }}>Search Prasadam in Cities</Text>
             </Pressable>
           </View>
 

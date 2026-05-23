@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, Pressable, TouchableOpacity, Image, useWindowDimensions,Platform } from 'react-native';
+import { View, Text, Modal, Pressable, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Feather } from '@expo/vector-icons';
+import { AppTheme } from '../constants/AppTheme';
 
 
 const SidebarMenu = () => {
@@ -13,9 +13,9 @@ const sidebarWidth = screenWidth > 768
   ? screenWidth * 0.2 
   : screenWidth * 0.6; 
   return (
-    <View style={{ marginRight: 8 }} className="mt-10">
+    <View style={{ marginRight: 8 }}>
       <Pressable onPress={() => setSidebarVisible(true)} className="p-0">
-      <Text style={{ fontSize: 24 }}>☰</Text>
+      <Text style={{ fontSize: 24, color: AppTheme.colors.textPrimary }}>☰</Text>
 </Pressable>
 
       <Modal
@@ -36,7 +36,7 @@ const sidebarWidth = screenWidth > 768
           <View
             style={{
               width:sidebarWidth,
-              backgroundColor: '#FFF7C0',
+              backgroundColor: AppTheme.colors.surfaceAlt,
               shadowColor: '#000',
               shadowOpacity: 0.3,
               shadowOffset: { width: 2, height: 0 },
@@ -60,15 +60,15 @@ const sidebarWidth = screenWidth > 768
     }}
     style={({ hovered }) => [
       {
-        paddingVertical: 24,
+        paddingVertical: 20,
         paddingHorizontal: 30,
         borderBottomWidth: 1,
-        borderBottomColor: '#E5C77F',
-        backgroundColor: hovered ? '#FFEFC1' : 'transparent',
+        borderBottomColor: AppTheme.colors.border,
+        backgroundColor: hovered ? AppTheme.colors.accentSoft : 'transparent',
       },
     ]}
   >
-    <Text style={{ fontSize: 18, color: '#1E3A8A' }} className="ml-4 mt-4">Vendor</Text>
+    <Text style={{ fontSize: 18, color: AppTheme.colors.textPrimary, fontWeight: "600" }} className="ml-4 mt-4">Vendor</Text>
   </Pressable>
 
   <Pressable
@@ -81,13 +81,13 @@ const sidebarWidth = screenWidth > 768
         paddingVertical: 14,
         paddingHorizontal: 30,
         borderBottomWidth: 1,
-        borderBottomColor: '#E5C77F',
-        backgroundColor: hovered ? '#FFEFC1' : 'transparent',
+        borderBottomColor: AppTheme.colors.border,
+        backgroundColor: hovered ? AppTheme.colors.accentSoft : 'transparent',
       },
     ]}
   >
     
-    <Text style={{ fontSize: 18, color: '#1E3A8A' }} className="ml-4 mt-4">Admin</Text>
+    <Text style={{ fontSize: 18, color: AppTheme.colors.textPrimary, fontWeight: "600" }} className="ml-4 mt-4">Admin</Text>
   </Pressable>
           </View>
           <View style={{ flex: 1 }} />

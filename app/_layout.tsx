@@ -33,7 +33,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
     <GluestackUIProvider mode="light">
-    <ThemeProvider value={colorScheme != 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
         <Stack.Screen name="index" options={{ headerShown:false }} />
         <Stack.Screen name="station/[id]" options={{ headerShown:false}} />

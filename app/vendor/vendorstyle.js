@@ -1,11 +1,12 @@
 import { StyleSheet } from 'react-native';
+import { AppTheme } from '../../constants/AppTheme';
 
 export default StyleSheet.create({
     container: {
         flexGrow: 1,
         alignItems: 'center',
         padding: 6,
-        backgroundColor: '#FFF7C0',
+        backgroundColor: AppTheme.colors.background,
       },
       contentWrapper: {
         width: '100%',
@@ -24,25 +25,25 @@ export default StyleSheet.create({
         marginBottom: 16,
       },
       menuCard: {
-        backgroundColor: '#ffffff',
+        backgroundColor: AppTheme.colors.surface,
         padding: 16,
         marginVertical: 10,
         width: '100%',
-        borderRadius: 12,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 6,
-        elevation: 4,
+        borderRadius: AppTheme.radius.lg,
+        borderWidth: 1,
+        borderColor: AppTheme.colors.border,
+        ...AppTheme.elevation.card,
       },
       menuTitle: {
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 6,
+        color: AppTheme.colors.textPrimary,
       },
       menuDetails: {
         fontSize: 14,
         marginBottom: 10,
+        color: AppTheme.colors.textSecondary,
       },
       buttonRow: {
         flexDirection: 'row',
@@ -50,7 +51,7 @@ export default StyleSheet.create({
         gap: 8,
       },
       addButton: {
-        backgroundColor: '#FF914D',
+        backgroundColor: AppTheme.colors.accentPrimary,
         paddingVertical: 8,
         paddingHorizontal: 14,
         borderRadius: 20,
@@ -58,7 +59,7 @@ export default StyleSheet.create({
         alignItems: 'center',
       },
       circleButton: {
-        backgroundColor: '#ccc',
+        backgroundColor: AppTheme.colors.surfaceAlt,
         borderRadius: 20,
         width: 30,
         height: 30,
@@ -68,12 +69,13 @@ export default StyleSheet.create({
       buttonText: {
         fontWeight: 'bold',
         fontSize: 16,
+        color: AppTheme.colors.textPrimary,
       },
       bottomButtonContainer: {
-        backgroundColor: '#2196F3',
+        backgroundColor: AppTheme.colors.accentPrimary,
         padding: 14,
         marginTop: 5,
-        borderRadius: 12,
+        borderRadius: AppTheme.radius.md,
         zIndex:10,
         elevation:5,        
       },
